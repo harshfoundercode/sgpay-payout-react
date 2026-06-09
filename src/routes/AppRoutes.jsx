@@ -1,0 +1,71 @@
+import React from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import BridgeAdminDashboard from '../components/DashboardLayout';
+
+// Protected Route Component
+const ProtectedRoute = ({ children }) => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+        return <Navigate to="/login" replace />;
+    }
+
+    return children;
+};
+
+// Public Route - Redirect to dashboard if already logged in
+const PublicRoute = ({ children }) => {
+    const token = localStorage.getItem('token');
+
+    if (token) {
+        return <Navigate to="/dashboard" replace />;
+    }
+
+    return children;
+};
+
+export const AppRoutes = () => {
+    return (
+        <Routes>
+            {/* Public Login Route */}
+            <Route
+                path="/login"
+                element={
+                    <PublicRoute>
+                        <div>Login Page Component Here</div>
+                    </PublicRoute>
+                }
+            />
+
+            {/* Protected Dashboard Routes */}
+            <Route
+                path="/"
+                element={
+                    <ProtectedRoute>
+                        <BridgeAdminDashboard />
+                    </ProtectedRoute>
+                }
+            >
+                <Route index element={<Navigate to="/dashboard" replace />} />
+                <Route path="dashboard" element={<BridgeAdminDashboard />} />
+                <Route path="transactions" element={<div>Transactions Page</div>} />
+                <Route path="merchants" element={<div>Merchants Page</div>} />
+                <Route path="payout-apis" element={<div>Payout APIs Page</div>} />
+                <Route path="routing" element={<div>Routing Page</div>} />
+                <Route path="auto-payout" element={<div>Auto Payout Page</div>} />
+                <Route path="balances-limits" element={<div>Balances & Limits Page</div>} />
+                <Route path="reports" element={<div>Reports Page</div>} />
+                <Route path="reconciliation" element={<div>Reconciliation Page</div>} />
+                <Route path="webhooks" element={<div>Webhooks Page</div>} />
+                <Route path="alerts" element={<div>Alerts Page</div>} />
+                <Route path="users-roles" element={<div>Users & Roles Page</div>} />
+                <Route path="logs" element={<div>Logs Page</div>} />
+                <Route path="settings" element={<div>Settings Page</div>} />
+                <Route path="system" element={<div>System Page</div>} />
+            </Route>
+
+            {/* Catch all - redirect to dashboard */}
+            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        </Routes>
+    );
+};
