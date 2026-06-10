@@ -28,22 +28,22 @@ export const AppRoutes = () => {
     return (
         <Routes>
             {/* Public Login Route */}
-            <Route
+            {/* <Route
                 path="/login"
                 element={
                     <PublicRoute>
                         <div>Login Page Component Here</div>
                     </PublicRoute>
                 }
-            />
+            /> */}
 
             {/* Protected Dashboard Routes */}
             <Route
                 path="/"
                 element={
-                    <ProtectedRoute>
+                    <PublicRoute>
                         <BridgeAdminDashboard />
-                    </ProtectedRoute>
+                    </PublicRoute>
                 }
             >
                 <Route index element={<Navigate to="/dashboard" replace />} />
