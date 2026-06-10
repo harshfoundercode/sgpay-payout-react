@@ -1,7 +1,6 @@
 import React from 'react';
 import { useState } from "react";
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
+import DateRangePicker from "../components/DatePicker";
 import {
     LayoutDashboard, CreditCard, Store, Zap, GitBranch, RefreshCw,
     Scale, FileText, GitMerge, Webhook, Bell, Users, FileCode,
@@ -19,17 +18,7 @@ import {
 } from "recharts";
 
 
-// Alert data
-const alertsData = [
-    { type: "Critical", icon: AlertTriangle, iconColor: "text-red-500", bg: "bg-red-50", title: "API Balance Low", desc: "Paytm Payouts balance is below threshold (₹ 15,000)", time: "5 min ago" },
-    { type: "Warning", icon: AlertTriangle, iconColor: "text-yellow-500", bg: "bg-yellow-50", title: "Daily Limit Exceeded", desc: "Easebuzz daily limit has been reached", time: "15 min ago" },
-    { type: "Warning", icon: AlertTriangle, iconColor: "text-yellow-500", bg: "bg-yellow-50", title: "API Down", desc: "Yes Bank API is currently unavailable", time: "30 min ago" },
-    { type: "Info", icon: Info, iconColor: "text-blue-500", bg: "bg-blue-50", title: "Reconciliation Pending", desc: "3 reconciliation items pending", time: "1 hour ago" },
-    { type: "Critical", icon: AlertTriangle, iconColor: "text-red-500", bg: "bg-red-50", title: "Webhook Failure", desc: "Multiple webhook delivery failures for MRC002", time: "2 hours ago" },
-    { type: "Info", icon: Info, iconColor: "text-blue-500", bg: "bg-blue-50", title: "New Merchant Onboarded", desc: "ABC Corp has completed onboarding successfully", time: "3 hours ago" },
-    { type: "Warning", icon: AlertTriangle, iconColor: "text-yellow-500", bg: "bg-yellow-50", title: "High Failure Rate", desc: "RazorpayX failure rate above 5% in last 30 min", time: "4 hours ago" },
-    { type: "Info", icon: CheckCircle, iconColor: "text-green-500", bg: "bg-green-50", title: "Settlement Completed", desc: "Daily settlement of ₹ 4,82,30,000 processed", time: "5 hours ago" },
-];
+
 
 // Payout pie chart data
 const payoutPie = [
@@ -374,27 +363,31 @@ function RecentTransactionsTable({ data }) {
     );
 }
 
-// Alerts panel component
-function AlertsPanel({ data }) {
-    return (
-        <Card>
-            <SectionTitle action="View All">Alerts & Notifications</SectionTitle>
-            <div className="space-y-2">
-                {data.slice(0, 4).map((alert, index) => (
-                    <AlertItem key={index} {...alert} />
-                ))}
-            </div>
-        </Card>
-    );
-}
 
 // ============================================
 // PAGE LAYOUT COMPONENT
 // ============================================
 
 function DashboardPage() {
-    const [startDate, setStartDate] = useState(new Date());
-    const [endDate, setEndDate] = useState(new Date());
+    const [dateRange, setDateRange] = useState(null);
+
+    const handleDateChange = (dateData) => {
+        if (dateData) {
+            setDateRange(dateData);
+            console.log('Date Range Selected:', {
+                startDate: dateData.startDate,
+                endDate: dateData.endDate,
+                startFormatted: dateData.startFormatted,
+                endFormatted: dateData.endFormatted,
+                dateRange: dateData.dateRange
+            });
+            // Fetch data for selected date range here
+            // fetchDashboardData(dateData.startDate, dateData.endDate);
+        } else {
+            console.log('Date range cleared');
+            // Handle clearing date range
+        }
+    };
     return (
         <div className="space-y-4">
             {/* Header Section */}
@@ -404,24 +397,10 @@ function DashboardPage() {
                     <p className="text-xs text-gray-800 mt-0.5">Welcome back, Super Admin! Here's what's happening today.</p>
                 </div>
                 <div className="flex gap-2">
-                    <div className="flex items-center gap-2 border border-gray-200 bg-white rounded-lg px-3 py-2 shadow-sm">
-                        <FileText size={14} className="text-gray-500" />
-
-                        <DatePicker
-                            selectsRange
-                            startDate={startDate}
-                            endDate={endDate}
-                            onChange={(dates) => {
-                                const [start, end] = dates;
-                                setStartDate(start);
-                                setEndDate(end);
-                            }}
-                            dateFormat="dd MMM yyyy"
-                            className="text-xs text-gray-700 outline-none cursor-pointer bg-transparent w-[220px]"
-                        />
-
-                        <ChevronDown size={12} className="text-gray-500" />
-                    </div>
+                    <DateRangePicker 
+                        onDateChange={handleDateChange}
+                        placeholder="14 May, 2025 - 14 May, 2025"
+                    />
                     <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-xs font-semibold">
                         <RefreshCw size={13} /> Refresh
                     </button>
@@ -450,10 +429,9 @@ function DashboardPage() {
             </div>
 
             {/* Tables Row */}
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-2">
                 <TopApisTable data={topApis} />
                 <RecentTransactionsTable data={recentTxns} />
-                <AlertsPanel data={alertsData} />
             </div>
         </div>
     );

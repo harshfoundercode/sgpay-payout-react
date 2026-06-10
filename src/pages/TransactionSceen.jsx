@@ -66,16 +66,16 @@ const StatusBadge = ({ status }) => {
 
 // ─── Transactions Page ─────────────────────────────────────────────────────
 const transactions = [
-    { id: "TXN12548789", orderId: "ORD12548789", merchant: "ABC Pvt Ltd", user: "Rohit Sharma", beneficiary: "Amit Kumar", phone: "9876543210", amount: "₹ 25,000.00", api: "RazorpayX", status: "Success", utr: "UTR5125487963", date: "14 May 2025", time: "11:30 AM" },
-    { id: "TXN12548788", orderId: "ORD12548788", merchant: "XYZ Solutions", user: "Neha Verma", beneficiary: "Suresh Yadav", phone: "9123456780", amount: "₹ 12,500.00", api: "Cashfree", status: "Success", utr: "CFR5125487881", date: "14 May 2025", time: "11:28 AM" },
-    { id: "TXN12548787", orderId: "ORD12548787", merchant: "PQR Services", user: "Vikram Singh", beneficiary: "Rahul Gupta", phone: "9012345678", amount: "₹ 8,750.00", api: "Paytm Payouts", status: "Failed", utr: "–", date: "14 May 2025", time: "11:27 AM" },
-    { id: "TXN12548786", orderId: "ORD12548786", merchant: "LMN Traders", user: "Anjali Mehta", beneficiary: "Vikas Patel", phone: "9098765432", amount: "₹ 15,000.00", api: "Easebuzz", status: "Returned", utr: "–", date: "14 May 2025", time: "11:25 AM" },
-    { id: "TXN12548785", orderId: "ORD12548785", merchant: "AAA Retail", user: "Priya Nair", beneficiary: "Sanjay Kumar", phone: "9876512340", amount: "₹ 5,500.00", api: "Yes Bank API", status: "Success", utr: "YB5125487854", date: "14 May 2025", time: "11:22 AM" },
-    { id: "TXN12548784", orderId: "ORD12548784", merchant: "Techno Soft", user: "Manoj Gupta", beneficiary: "Deepak Singh", phone: "9123409876", amount: "₹ 50,000.00", api: "RazorpayX", status: "Processing", utr: "–", date: "14 May 2025", time: "11:20 AM" },
-    { id: "TXN12548783", orderId: "ORD12548783", merchant: "Global Infotech", user: "Karan Malhotra", beneficiary: "Nitin Verma", phone: "9011122233", amount: "₹ 20,000.00", api: "Cashfree", status: "Failed", utr: "–", date: "14 May 2025", time: "11:18 AM" },
-    { id: "TXN12548782", orderId: "ORD12548782", merchant: "Max Stores", user: "Pooja Shah", beneficiary: "Ramesh Das", phone: "9898989898", amount: "₹ 3,200.00", api: "Paytm Payouts", status: "Success", utr: "PYT5125487822", date: "14 May 2025", time: "11:15 AM" },
-    { id: "TXN12548781", orderId: "ORD12548781", merchant: "Sunrise Enterprises", user: "Alok Tiwari", beneficiary: "Mahesh Yadav", phone: "9090909090", amount: "₹ 7,800.00", api: "Easebuzz", status: "Processing", utr: "–", date: "14 May 2025", time: "11:12 AM" },
-    { id: "TXN12548780", orderId: "ORD12548780", merchant: "Kiran Industries", user: "Simran Kaur", beneficiary: "Gaurav Sharma", phone: "9871234560", amount: "₹ 18,600.00", api: "Yes Bank API", status: "Success", utr: "YB5125487800", date: "14 May 2025", time: "11:10 AM" },
+    { no:"1",id: "TXN12548789", orderId: "ORD12548789", merchant: "ABC Pvt Ltd", user: "Rohit Sharma", beneficiary: "Amit Kumar", phone: "9876543210", amount: "₹ 25,000.00", api: "RazorpayX", status: "Success", utr: "UTR5125487963", date: "14 May 2025", time: "11:30 AM" },
+    { no:"2",id: "TXN12548788", orderId: "ORD12548788", merchant: "XYZ Solutions", user: "Neha Verma", beneficiary: "Suresh Yadav", phone: "9123456780", amount: "₹ 12,500.00", api: "Cashfree", status: "Success", utr: "CFR5125487881", date: "14 May 2025", time: "11:28 AM" },
+    { no:"3",id: "TXN12548787", orderId: "ORD12548787", merchant: "PQR Services", user: "Vikram Singh", beneficiary: "Rahul Gupta", phone: "9012345678", amount: "₹ 8,750.00", api: "Paytm Payouts", status: "Failed", utr: "–", date: "14 May 2025", time: "11:27 AM" },
+    { no:"4",id: "TXN12548786", orderId: "ORD12548786", merchant: "LMN Traders", user: "Anjali Mehta", beneficiary: "Vikas Patel", phone: "9098765432", amount: "₹ 15,000.00", api: "Easebuzz", status: "Returned", utr: "–", date: "14 May 2025", time: "11:25 AM" },
+    { no:"5",id: "TXN12548785", orderId: "ORD12548785", merchant: "AAA Retail", user: "Priya Nair", beneficiary: "Sanjay Kumar", phone: "9876512340", amount: "₹ 5,500.00", api: "Yes Bank API", status: "Success", utr: "YB5125487854", date: "14 May 2025", time: "11:22 AM" },
+    { no:"6",id: "TXN12548784", orderId: "ORD12548784", merchant: "Techno Soft", user: "Manoj Gupta", beneficiary: "Deepak Singh", phone: "9123409876", amount: "₹ 50,000.00", api: "RazorpayX", status: "Processing", utr: "–", date: "14 May 2025", time: "11:20 AM" },
+    { no:"7",id: "TXN12548783", orderId: "ORD12548783", merchant: "Global Infotech", user: "Karan Malhotra", beneficiary: "Nitin Verma", phone: "9011122233", amount: "₹ 20,000.00", api: "Cashfree", status: "Failed", utr: "–", date: "14 May 2025", time: "11:18 AM" },
+    { no:"8",id: "TXN12548782", orderId: "ORD12548782", merchant: "Max Stores", user: "Pooja Shah", beneficiary: "Ramesh Das", phone: "9898989898", amount: "₹ 3,200.00", api: "Paytm Payouts", status: "Success", utr: "PYT5125487822", date: "14 May 2025", time: "11:15 AM" },
+    { no:"9",id: "TXN12548781", orderId: "ORD12548781", merchant: "Sunrise Enterprises", user: "Alok Tiwari", beneficiary: "Mahesh Yadav", phone: "9090909090", amount: "₹ 7,800.00", api: "Easebuzz", status: "Processing", utr: "–", date: "14 May 2025", time: "11:12 AM" },
+    { no:"10",id: "TXN12548780", orderId: "ORD12548780", merchant: "Kiran Industries", user: "Simran Kaur", beneficiary: "Gaurav Sharma", phone: "9871234560", amount: "₹ 18,600.00", api: "Yes Bank API", status: "Success", utr: "YB5125487800", date: "14 May 2025", time: "11:10 AM" },
 ];
 
 const tabs = [
@@ -140,7 +140,7 @@ const TransactionsPage = ({ onViewDetails }) => {
             </div>
 
             {/* Filters */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 mb-4">
+            <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-4">
                 <div className="flex flex-wrap gap-3 mb-3">
                     {/* Date */}
                     <div className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm text-black font-semibold cursor-pointer hover:bg-gray-50 bg-white">
@@ -167,8 +167,8 @@ const TransactionsPage = ({ onViewDetails }) => {
             </div>
 
             {/* Tabs */}
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                <div className="flex border-b border-gray-100 px-4 pt-3 gap-1 overflow-x-auto overflow-hidden hide-scrollbar">
+            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+                <div className="flex border-b border-gray-100 px-4 pt-3 pb-3 gap-1 overflow-x-auto overflow-hidden hide-scrollbar">
                     {tabs.map((tab) => (
                         <button
                             key={tab.label}
@@ -189,7 +189,7 @@ const TransactionsPage = ({ onViewDetails }) => {
                     <table className="w-full">
                         <thead>
                             <tr className="bg-gray-50 border-b border-gray-100">
-                                <th className="w-10 px-4 py-3"><input type="checkbox" className="rounded border-gray-300" /></th>
+                                <th className="w-10 px-4 py-3"> <span className="flex items-center text-sm text-gray-700">#</span></th>
                                 {["Txn ID", "Order ID", "Merchant", "User", "Beneficiary", "Amount", "API Used", "Status", "UTR / Reference No.", "Created At", "Actions"].map((h) => (
                                     <th key={h} className="px-3 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">{h}</th>
                                 ))}
@@ -198,7 +198,7 @@ const TransactionsPage = ({ onViewDetails }) => {
                         <tbody>
                             {transactions.map((txn) => (
                                 <tr key={txn.id} className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors group">
-                                    <td className="px-4 py-3"><input type="checkbox" className="rounded border-gray-300" /></td>
+                                    <td className="px-4 py-3"> <span className="flex items-center text-sm text-gray-700">{txn.no}</span></td>
                                     <td className="px-3 py-3 text-xs font-mono text-blue-600 whitespace-nowrap cursor-pointer hover:underline" onClick={() => onViewDetails(txn)}>{txn.id}</td>
                                     <td className="px-3 py-3 text-xs text-gray-600 font-mono whitespace-nowrap">{txn.orderId}</td>
                                     <td className="px-3 py-3 text-xs text-gray-800 font-medium whitespace-nowrap">{txn.merchant}</td>
@@ -282,11 +282,11 @@ const StatusStep = ({ label, date, time, done, active }) => (
 
 const TransactionDetails = ({ txn, onBack }) => {
     const [activeTab, setActiveTab] = useState("Overview");
-    const detailTabs = ["Overview", "Beneficiary Details", "Timeline", "API Logs", "Webhooks", "Retry History", "Comments"];
+    const detailTabs = ["Overview"];
 
     return (
-        <div className="flex-1 overflow-auto bg-gray-50">
-            <div className="p-6">
+        <div className="flex-1 overflow-auto hide-scrollbar bg-gray-50">
+            <div className="p-1">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-5">
                     <div>
@@ -317,7 +317,7 @@ const TransactionDetails = ({ txn, onBack }) => {
                 </div>
 
                 {/* Summary card */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-4">
+                <div className="bg-white rounded-2xl border border-gray-100 p-5 mb-4">
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
                         {[
                             { label: "Transaction ID", value: txn?.id || "TXN12548789", extra: <StatusBadge status="Success" />, mono: true },
@@ -345,7 +345,7 @@ const TransactionDetails = ({ txn, onBack }) => {
                 </div>
 
                 {/* Tabs */}
-                <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="bg-white rounded-2xl  border border-gray-100 overflow-hidden">
                     <div className="flex border-b border-gray-100 px-4 overflow-x-auto">
                         {detailTabs.map((tab) => (
                             <button
@@ -517,16 +517,13 @@ export default function TransactionScreen() {
     };
 
     return (
-        <div className="flex h-screen font-sans overflow-hidden hide-scrollbar">
+        <div className="flex h-screen overflow-auto hide-scrollbar">
 
-            <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-
-                {page === "transactions" ? (
+            {page === "transactions" ? (
                     <TransactionsPage onViewDetails={handleViewDetails} />
                 ) : (
                     <TransactionDetails txn={selectedTxn} onBack={handleBack} />
                 )}
-            </div>
         </div>
     );
 }

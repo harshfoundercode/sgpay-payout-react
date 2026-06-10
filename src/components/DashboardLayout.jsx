@@ -2,13 +2,14 @@ import { useState } from "react";
 import {
   House, CreditCard, Store, Zap, GitBranch, RefreshCw,
   Scale, FileText, GitMerge, Webhook, Bell, Users, FileCode,
-  Settings, Monitor, ChevronDown, Search, Moon, Menu,
+  Settings, Monitor, ChevronDown, ChevronRight, Search, Moon, Menu,
   ShieldAlert, TrendingUp, TrendingDown, CheckCircle, XCircle,
   RotateCcw, Wallet, BarChart2, Layers, UserCheck,
-  AlertTriangle, Info, Power, Activity, Globe, Lock,
-  Database, Download, Filter, Eye, Edit, Trash2, Plus,
-  ArrowUpRight, ArrowDownRight, Package, Cpu, HardDrive,
-  ToggleLeft, ToggleRight, Send, Clock, CheckSquare,
+  AlertTriangle, Info, Power, Edit, Trash2, Plus,
+  Eye, EyeOff, Copy, MoreVertical, ArrowLeft, ExternalLink,
+  Database, Activity, Clock, Shield, Cpu, HardDrive,
+  PauseCircle, Download, Filter, RefreshCcw, Wrench,
+  ChevronLeft, HelpCircle, Sun, X, Check, AlertCircle,
 } from "lucide-react";
 import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -16,50 +17,128 @@ import {
 } from "recharts";
 import DashboardPage from "../pages/Dashboard";
 import TransactionScreen from "../pages/TransactionSceen";
+import ApiProvidersPage from "../pages/payoutApis/ApiProvider";
+import ApiProviderDetail from "../pages/payoutApis/ApiProviderDetails";
+import MerchantListPage from "../pages/merchant/merchantList";
+import MerchantDetailsPage from "../pages/merchant/merchantDetails";
+import AutoPayout from "../pages/AutoPayout";
+import PayoutRouting from "../pages/Routing";
+import ReportsOverview from "../pages/reports/TransactionReports";
 
 
-
-const navItems = [
+const navConfig = [
   { id: "dashboard", label: "Dashboard", Icon: House },
-  { id: "transactions", label: "Transactions", Icon: CreditCard, hasChevron: true },
-  { id: "merchants", label: "Merchants", Icon: Store },
-  { id: "payout-apis", label: "Payout APIs", Icon: Zap, hasChevron: true },
-  { id: "routing", label: "Routing", Icon: GitBranch, hasChevron: true },
-  { id: "auto-payout", label: "Auto Payout", Icon: RefreshCw },
-  { id: "balances", label: "Balances & Limits", Icon: Scale, hasChevron: true },
-  { id: "reports", label: "Reports", Icon: FileText, hasChevron: true },
-  { id: "reconciliation", label: "Reconciliation", Icon: GitMerge },
-  { id: "webhooks", label: "Webhooks", Icon: Webhook },
-  { id: "alerts", label: "Alerts", Icon: Bell, badge: 12 },
-  { id: "users", label: "Users & Roles", Icon: Users },
-  { id: "logs", label: "Logs", Icon: FileCode, hasChevron: true },
+  { id: "transactions", label: "Transactions", Icon: CreditCard },
+  { id: "merchants", label: "Merchants", Icon: Store, },
+  { id: "payout-apis", label: "Payout APIs", Icon: Zap, },
+  { id: "routing", label: "Routing", Icon: GitBranch, },
+  { id: "auto-payout", label: "Auto Pay", Icon: RefreshCw },
+  {
+    id: "reports", label: "Reports", Icon: FileText, hasChevron: true,
+    sub: [
+     
+      {
+        id: "transaction-report",
+        label: "Transactions Reports",
+        Icon: FileText
+      },
+      {
+        id: "merchant-report",
+        label: "Merchant Reports",
+        Icon: FileText
+      },
+       
+      {
+        id: "payout-report",
+        label: "Payout Reports",
+        Icon: FileText
+      },
+      {
+        id: "settlement-report",
+        label: "Settlement Reports",
+        Icon: FileText
+      },
+      {
+        id: "success-failure",
+        label: "Success/Failure Reports",
+        Icon: FileText
+      },
+
+    ],
+  },
   { id: "settings", label: "Settings", Icon: Settings },
-  { id: "system", label: "System", Icon: Monitor, hasChevron: true },
 ];
 
-
-const PAGES = {
-  "dashboard": <DashboardPage />,
-  "transactions": <TransactionScreen />,
-  "merchants": <DashboardPage />,
-  "payout-apis": <DashboardPage />,
-  "routing": <DashboardPage />,
-  "auto-payout": <DashboardPage />,
-  "balances": <DashboardPage />,
-  "reports": <DashboardPage />,
-  "reconciliation": <DashboardPage />,
-  "webhooks": <DashboardPage />,
-  "alerts": <DashboardPage />,
-  "users": <DashboardPage />,
-  "logs": <DashboardPage />,
-  "settings": <DashboardPage />,
-  "system": <DashboardPage />,
-};
-
+function PlaceholderPage({ title, subtitle }) {
+  return (
+    <div className="p-6">
+      <h1 className="text-xl font-bold text-gray-800 mb-1">{title}</h1>
+      <p className="text-sm text-gray-400">{subtitle}</p>
+      <div className="mt-8 flex flex-col items-center justify-center h-64 text-gray-300 gap-3">
+        <Database size={48} /><p className="text-base">This section is under construction</p>
+      </div>
+    </div>
+  );
+}
 
 export default function BridgeAdminDashboard() {
   const [activePage, setActivePage] = useState("dashboard");
+  const [activeDetail, setActiveDetail] = useState(null);   // api id for detail view
   const [collapsed, setCollapsed] = useState(false);
+  const [expandedNav, setExpandedNav] = useState({ "payout-apis": false });
+  const [selectedMerchant, setSelectedMerchant] = useState(null);
+
+
+  function navigate(pageId) {
+    setActivePage(pageId);
+    setActiveDetail(null);
+  }
+
+  function toggleNav(id) {
+    setExpandedNav(prev => ({ ...prev, [id]: !prev[id] }));
+  }
+
+  function viewApiDetail(apiId) {
+    setActivePage("api-providers");
+    setActiveDetail(apiId);
+  }
+
+  function renderPage() {
+    if (activePage === "dashboard") return <DashboardPage />;
+    if (activePage === "transactions") return <TransactionScreen />;
+    if (activePage === "auto-payout") return <AutoPayout />;
+    if (activePage === "routing") return <PayoutRouting />;
+    if (activePage === "transaction-report")return <ReportsOverview />;
+    if (activePage === "payout-apis") {
+      if (activeDetail) {
+        return (
+          <ApiProviderDetail
+            apiId={activeDetail}
+            onBack={() => setActiveDetail(null)}
+          />
+        );
+      }
+      return <ApiProvidersPage onViewDetail={(id) => setActiveDetail(id)} />;
+    }
+    if (activePage === "merchants") {
+      if (selectedMerchant) {
+        return (
+          <MerchantDetailsPage
+            merchant={selectedMerchant}
+            onBack={() => setSelectedMerchant(null)}
+          />
+        );
+      }
+      return (
+        <MerchantListPage
+          onViewDetails={(m) => setSelectedMerchant(m)}
+        />
+      );
+    }
+
+    const nav = navConfig.find(n => n.id === activePage);
+    return <PlaceholderPage title={nav?.label || activePage} subtitle="This section is under construction." />;
+  }
 
   return (
     <div className="flex h-screen bg-gray-100 font-sans text-sm overflow-hidden">
@@ -76,26 +155,53 @@ export default function BridgeAdminDashboard() {
 
         {/* Nav */}
         <nav className="flex-1 py-3 px-2 space-y-0.5">
-          {navItems.map(({ id, label, Icon, badge, hasChevron }) => (
-            <button
-              key={id}
-              onClick={() => setActivePage(id)}
-              title={collapsed ? label : undefined}
-              className={`w-full flex items-center ${collapsed ? "justify-center" : "justify-between"} px-3 py-2 rounded-lg text-left transition-colors
-                ${activePage === id ? "bg-[#3A7EFD] text-white" : "text-gray-400 hover:bg-white/10 hover:text-white"}`}
-            >
-              <div className={`flex items-center ${collapsed ? "" : "gap-3"}`}>
-                <Icon size={16} className="flex-shrink-0" />
-                {!collapsed && <span className="text-[13px]">{label}</span>}
+          {navConfig.map(item => {
+            const isActive = activePage === item.id || (item.sub && item.sub.some(s => s.id === activePage));
+            const isExpanded = expandedNav[item.id];
+
+            return (
+              <div key={item.id}>
+                <button
+                  onClick={() => {
+                    if (item.sub) { toggleNav(item.id); if (!collapsed) return; }
+                    navigate(item.id);
+                  }}
+                  title={collapsed ? item.label : undefined}
+                  className={`w-full flex items-center ${collapsed ? "justify-center" : "justify-between"} px-3 py-2 rounded-lg transition-colors
+                    ${isActive ? "bg-blue-600 text-white" : "text-gray-400 hover:bg-white/10 hover:text-white"}`}
+                >
+                  <div className={`flex items-center ${collapsed ? "" : "gap-3"}`}>
+                    <item.Icon size={16} className="flex-shrink-0" />
+                    {!collapsed && <span className="text-[13px]">{item.label}</span>}
+                  </div>
+                  {!collapsed && (
+                    item.badge
+                      ? <span className="bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">{item.badge}</span>
+                      : item.hasChevron
+                        ? <ChevronDown size={13} className={`opacity-50 transition-transform ${isExpanded ? "rotate-180" : ""}`} />
+                        : null
+                  )}
+                </button>
+
+                {/* Sub-items */}
+                {item.sub && isExpanded && !collapsed && (
+                  <div className="ml-4 mt-0.5 space-y-0.5 border-l border-white/10 pl-3">
+                    {item.sub.map(sub => (
+                      <button
+                        key={sub.id}
+                        onClick={() => navigate(sub.id)}
+                        className={`w-full flex items-center gap-2.5 px-2 py-1.5 rounded-lg text-[12px] transition-colors
+                          ${activePage === sub.id ? "text-white bg-blue-500/50" : "text-gray-400 hover:text-white hover:bg-white/10"}`}
+                      >
+                        <sub.Icon size={13} className="flex-shrink-0" />
+                        {sub.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
-              {!collapsed && badge && (
-                <span className="bg-red-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center">{badge}</span>
-              )}
-              {!collapsed && !badge && hasChevron && (
-                <ChevronDown size={13} className="opacity-40" />
-              )}
-            </button>
-          ))}
+            );
+          })}
         </nav>
 
         {/* Kill Switch */}
@@ -116,24 +222,28 @@ export default function BridgeAdminDashboard() {
         </div>
       </aside>
 
-      {/* ── MAIN AREA ── */}
+      {/* ── MAIN ── */}
       <div className="flex-1 flex flex-col overflow-hidden">
 
         {/* Topbar */}
-        <header className="bg-white border-b border-gray-200 px-5 py-3 flex items-center gap-4 flex-shrink-0">
+        <header className="bg-white border-b border-gray-200 px-5 py-3 flex items-center gap-4 flex-shrink-0 h-14">
           <button onClick={() => setCollapsed(!collapsed)} className="text-gray-400 hover:text-gray-600 p-1">
             <Menu size={20} />
           </button>
-          <div className="flex-1 max-w-md relative">
+          <div className="flex-1 max-w-lg relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input className="w-full pl-9 pr-4 py-2 bg-gray-100 rounded-lg text-xs text-gray-600 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-100" placeholder="Search by Transaction ID / Merchant / UTR / Order ID" />
+            <input className="w-full pl-9 pr-4 py-2 bg-gray-100 rounded-lg text-xs text-gray-600 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-100"
+              placeholder="Search by API name / Merchant / Transaction ID" />
+            <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-300 border border-gray-200 rounded px-1">⌘ K</kbd>
           </div>
           <div className="ml-auto flex items-center gap-4">
+            <Sun size={18} className="text-gray-400 cursor-pointer" />
             <div className="relative cursor-pointer">
               <Bell size={20} className="text-gray-400" />
-              <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">18</span>
+              <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">16</span>
             </div>
-            <Moon size={18} className="text-gray-400 cursor-pointer" />
+            <HelpCircle size={18} className="text-gray-400 cursor-pointer" />
+            <Moon size={17} className="text-gray-400 cursor-pointer" />
             <div className="flex items-center gap-2 cursor-pointer">
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold">SA</div>
               <div>
@@ -145,9 +255,10 @@ export default function BridgeAdminDashboard() {
           </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-5">
-          {PAGES[activePage] || <DashboardPage />}
+        {/* Content */}
+
+        <main className="flex-1 overflow-y-auto p-5 bg-gray-50">
+          {renderPage()}
         </main>
       </div>
     </div>
