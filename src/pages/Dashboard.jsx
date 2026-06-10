@@ -1,5 +1,7 @@
 import React from 'react';
 import { useState } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import {
     LayoutDashboard, CreditCard, Store, Zap, GitBranch, RefreshCw,
     Scale, FileText, GitMerge, Webhook, Bell, Users, FileCode,
@@ -76,18 +78,18 @@ const volumeData = [
 
 // Top cards data
 const topCards = [
-    { label: "Total Withdrawal Requests", value: "12,45,678", change: "+12.5% vs yesterday", up: true, bg: "bg-blue-50", iconBg: "bg-blue-100", iconColor: "text-blue-500", Icon: CreditCard,borderColor: "border-blue-200",textColor: "text-blue-700" },
-    { label: "Successful Payouts", value: "11,45,231", change: "+10.8% vs yesterday", up: true, bg: "bg-green-50", iconBg: "bg-green-100", iconColor: "text-green-500", Icon: CheckCircle,borderColor: "border-green-200",textColor: "text-green-700" },
-    { label: "Failed Payouts", value: "45,231", change: "+8.2% vs yesterday", up: false, bg: "bg-red-50", iconBg: "bg-red-100", iconColor: "text-red-500", Icon: XCircle,borderColor: "border-red-200",textColor: "text-red-700" },
-    { label: "Returned to SGPay", value: "55,216", change: "−5.3% vs yesterday", up: true, bg: "bg-orange-50", iconBg: "bg-orange-100", iconColor: "text-orange-500", Icon: RotateCcw,borderColor: "border-orange-200",textColor: "text-orange-700" },
+    { label: "Total Withdrawal Requests", value: "12,45,678", change: "+12.5% vs yesterday", up: true, bg: "bg-blue-50", iconBg: "bg-blue-100", iconColor: "text-blue-500", Icon: CreditCard, borderColor: "border-blue-200", textColor: "text-blue-700" },
+    { label: "Successful Payouts", value: "11,45,231", change: "+10.8% vs yesterday", up: true, bg: "bg-green-50", iconBg: "bg-green-100", iconColor: "text-green-500", Icon: CheckCircle, borderColor: "border-green-200", textColor: "text-green-700" },
+    { label: "Failed Payouts", value: "45,231", change: "+8.2% vs yesterday", up: false, bg: "bg-red-50", iconBg: "bg-red-100", iconColor: "text-red-500", Icon: XCircle, borderColor: "border-red-200", textColor: "text-red-700" },
+    { label: "Returned to SGPay", value: "55,216", change: "−5.3% vs yesterday", up: true, bg: "bg-orange-50", iconBg: "bg-orange-100", iconColor: "text-orange-500", Icon: RotateCcw, borderColor: "border-orange-200", textColor: "text-orange-700" },
 ];
 
 // Bottom cards data
 const bottomCards = [
-    { label: "Total Transaction Amount", value: "₹ 48,75,45,231", change: "+15.6% vs yesterday",bg: "bg-purple-50", up: true, iconBg: "bg-purple-100", iconColor: "text-purple-500", Icon: Wallet, borderColor: "border-purple-200",textColor: "text-purple-700" },
-    { label: "Today's Processing Volume", value: "₹ 6,75,45,231", change: "+11.3% vs yesterday",bg: "bg-blue-50", up: true, iconBg: "bg-blue-100", iconColor: "text-blue-500", Icon: BarChart2, borderColor: "border-blue-200",textColor: "text-blue-700" },
-    { label: "Active APIs", value: "8 / 12", change: "Online", up: null, iconBg: "bg-yellow-100",bg: "bg-yellow-50", iconColor: "text-yellow-500", Icon: Layers, borderColor: "border-yellow-200",textColor: "text-yellow-700" },
-    { label: "Active Merchants", value: "1,325", change: "+5.7% vs yesterday", up: true, bg: "bg-teal-50",iconBg: "bg-teal-100", iconColor: "text-teal-500", Icon: UserCheck ,borderColor: "border-teal-200",textColor: "text-teal-700" },
+    { label: "Total Transaction Amount", value: "₹ 48,75,45,231", change: "+15.6% vs yesterday", bg: "bg-purple-50", up: true, iconBg: "bg-purple-100", iconColor: "text-purple-500", Icon: Wallet, borderColor: "border-purple-200", textColor: "text-purple-700" },
+    { label: "Today's Processing Volume", value: "₹ 6,75,45,231", change: "+11.3% vs yesterday", bg: "bg-blue-50", up: true, iconBg: "bg-blue-100", iconColor: "text-blue-500", Icon: BarChart2, borderColor: "border-blue-200", textColor: "text-blue-700" },
+    { label: "Active APIs", value: "8 / 12", change: "Online", up: null, iconBg: "bg-yellow-100", bg: "bg-yellow-50", iconColor: "text-yellow-500", Icon: Layers, borderColor: "border-yellow-200", textColor: "text-yellow-700" },
+    { label: "Active Merchants", value: "1,325", change: "+5.7% vs yesterday", up: true, bg: "bg-teal-50", iconBg: "bg-teal-100", iconColor: "text-teal-500", Icon: UserCheck, borderColor: "border-teal-200", textColor: "text-teal-700" },
 ];
 
 // ============================================
@@ -136,14 +138,14 @@ function StatusBadge({ status }) {
 }
 
 // Metric card component (for both top and bottom cards)
-function MetricCard({ label, value, change, up, bg, iconBg, iconColor, Icon , borderColor,textColor}) {
-  
+function MetricCard({ label, value, change, up, bg, iconBg, iconColor, Icon, borderColor, textColor }) {
+
     return (
         <div className={`${bg} ${borderColor} border rounded-xl p-4 flex justify-between items-start`}>
             <div>
                 <p className={`text-xs ${textColor} font-medium`}>
-  {label}
-</p>
+                    {label}
+                </p>
                 <p className="text-2xl font-bold text-gray-800 mt-1">{value}</p>
                 <p className={`text-[11px] mt-1 font-medium flex items-center gap-1 ${up === false ? "text-red-500" : "text-green-600"}`}>
                     {up !== null && (up ? <TrendingUp size={11} /> : <TrendingDown size={11} />)} {change}
@@ -257,8 +259,8 @@ function VolumeChart({ data }) {
                             fontWeight: 600,
                             fill: "#6b7280"
                         }}
-                         axisLine={{ stroke: "#d1d5db" }}
-  tickLine={{ stroke: "#d1d5db" }}
+                        axisLine={{ stroke: "#d1d5db" }}
+                        tickLine={{ stroke: "#d1d5db" }}
                     />
 
                     <YAxis
@@ -267,8 +269,8 @@ function VolumeChart({ data }) {
                             fontWeight: 600,
                             fill: "#6b7280"
                         }}
-                         axisLine={{ stroke: "#d1d5db" }}
-  tickLine={{ stroke: "#d1d5db" }}
+                        axisLine={{ stroke: "#d1d5db" }}
+                        tickLine={{ stroke: "#d1d5db" }}
                         tickFormatter={v => `${(v / 1000000).toFixed(0)}M`}
                     />
                     <Tooltip formatter={v => `₹ ${(v / 100000).toFixed(1)}L`} contentStyle={{ fontSize: 11 }} />
@@ -391,6 +393,8 @@ function AlertsPanel({ data }) {
 // ============================================
 
 function DashboardPage() {
+    const [startDate, setStartDate] = useState(new Date());
+    const [endDate, setEndDate] = useState(new Date());
     return (
         <div className="space-y-4">
             {/* Header Section */}
@@ -400,9 +404,24 @@ function DashboardPage() {
                     <p className="text-xs text-gray-800 mt-0.5">Welcome back, Super Admin! Here's what's happening today.</p>
                 </div>
                 <div className="flex gap-2">
-                    <button className="flex items-center gap-2 border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-600 bg-white hover:bg-gray-50">
-                        <FileText size={13} /> 14 May, 2025 - 14 May, 2025 <ChevronDown size={12} />
-                    </button>
+                    <div className="flex items-center gap-2 border border-gray-200 bg-white rounded-lg px-3 py-2 shadow-sm">
+                        <FileText size={14} className="text-gray-500" />
+
+                        <DatePicker
+                            selectsRange
+                            startDate={startDate}
+                            endDate={endDate}
+                            onChange={(dates) => {
+                                const [start, end] = dates;
+                                setStartDate(start);
+                                setEndDate(end);
+                            }}
+                            dateFormat="dd MMM yyyy"
+                            className="text-xs text-gray-700 outline-none cursor-pointer bg-transparent w-[220px]"
+                        />
+
+                        <ChevronDown size={12} className="text-gray-500" />
+                    </div>
                     <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-4 py-2 text-xs font-semibold">
                         <RefreshCw size={13} /> Refresh
                     </button>
