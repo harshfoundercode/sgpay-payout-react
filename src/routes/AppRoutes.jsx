@@ -1,6 +1,7 @@
 import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import BridgeAdminDashboard from '../components/DashboardLayout';
+import BridgeLogin from '../pages/auth/LoginScreen';
 
 // Protected Route Component
 const ProtectedRoute = ({ children }) => {
@@ -29,10 +30,10 @@ export const AppRoutes = () => {
         <Routes>
             {/* Public Login Route */}
             {/* <Route
-                path="/login"
+                path="/"
                 element={
                     <PublicRoute>
-                        <div>Login Page Component Here</div>
+                        <BridgeLogin />
                     </PublicRoute>
                 }
             /> */}
