@@ -594,6 +594,7 @@ import MerchantReport from "../pages/reports/MerchantReports";
 import PayoutReport from "../pages/reports/PayoutReports";
 import SettlementReport from "../pages/reports/SettlementReports";
 import { useNavigate } from 'react-router-dom';
+import SuccessFailureReport from "../pages/reports/SuccessFailureReports";
 
 const navConfig = [
   { id: "dashboard", label: "Dashboard", Icon: House },
@@ -691,7 +692,7 @@ export default function BridgeAdminDashboard() {
     if (activePage === "merchant-report") return <MerchantReport />;
     if (activePage === "payout-report") return <PayoutReport />;
     if (activePage === "settlement-report") return <SettlementReport />;
-    if (activePage === "success-failure") return <PlaceholderPage title="Success/Failure Reports" subtitle="Monitor transaction success rates" />;
+    if (activePage === "success-failure") return <SuccessFailureReport />;
     if (activePage === "payout-apis") {
       if (activeDetail) {
         return (
