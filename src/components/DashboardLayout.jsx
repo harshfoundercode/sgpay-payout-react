@@ -595,11 +595,25 @@ import PayoutReport from "../pages/reports/PayoutReports";
 import SettlementReport from "../pages/reports/SettlementReports";
 import { useNavigate } from 'react-router-dom';
 import SuccessFailureReport from "../pages/reports/SuccessFailureReports";
+import CreateMerchantPage from "../pages/merchant/AddMerchant";
 
 const navConfig = [
   { id: "dashboard", label: "Dashboard", Icon: House },
   { id: "transactions", label: "Transactions", Icon: CreditCard },
-  { id: "merchants", label: "Merchants", Icon: Store },
+  {
+    id: "merchants", label: "Merchants", Icon: Store, hasChevron: true, sub: [
+      {
+        id: "create-merchant",
+        label: "Create Merchant",
+        Icon: Receipt
+      },
+      {
+        id: "all-merchant",
+        label: "All Merchant",
+        Icon: Receipt
+      },
+    ]
+  },
   { id: "payout-apis", label: "Payout APIs", Icon: Zap },
   { id: "routing", label: "Routing", Icon: GitBranch },
   { id: "auto-payout", label: "Auto Pay", Icon: RefreshCw },
@@ -636,7 +650,10 @@ const navConfig = [
       },
     ],
   },
-  { id: "settings", label: "Settings", Icon: Settings },
+  { id: "settings", label: "Settings", Icon: Settings, hasChevron: true, sub: [
+    { id: "profile-settings", label: "Profile Settings", Icon: UserCheck },
+    { id: "system-settings", label: "System Settings", Icon: Wrench },
+  ] },
 ];
 
 function PlaceholderPage({ title, subtitle }) {
@@ -669,7 +686,7 @@ export default function BridgeAdminDashboard() {
     localStorage.removeItem('bridge_admin_email');
     localStorage.removeItem('bridge_admin_remember');
     sessionStorage.clear();
-    
+
     // Navigate to logout screen
     navigate('/logout');
   };
@@ -693,6 +710,7 @@ export default function BridgeAdminDashboard() {
     if (activePage === "payout-report") return <PayoutReport />;
     if (activePage === "settlement-report") return <SettlementReport />;
     if (activePage === "success-failure") return <SuccessFailureReport />;
+    if (activePage === "create-merchant") return <CreateMerchantPage />;
     if (activePage === "payout-apis") {
       if (activeDetail) {
         return (
@@ -704,7 +722,7 @@ export default function BridgeAdminDashboard() {
       }
       return <ApiProvidersPage onViewDetail={(id) => setActiveDetail(id)} />;
     }
-    if (activePage === "merchants") {
+    if (activePage === "all-merchant") {
       if (selectedMerchant) {
         return (
           <MerchantDetailsPage
@@ -730,7 +748,7 @@ export default function BridgeAdminDashboard() {
       {/* ── SIDEBAR WITH WHITE BACKGROUND ── */}
       <aside className={`${collapsed ? "w-16" : "w-56"} bg-white shadow-lg flex flex-col shrink-0 h-full overflow-y-auto hide-scrollbar transition-all duration-200 border-r border-gray-200`}>
         {/* Logo */}
-        <div className={`flex items-center gap-2.5 px-4 py-4 border-b border-gray-200 ${collapsed ? "justify-center" : ""}`}>
+        <div className={`flex items-center gap-2.5 px-3 py-3 border-b border-gray-200 ${collapsed ? "justify-center" : ""}`}>
           <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center shrink-0">
             <svg width="18" height="18" fill="white" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /></svg>
           </div>
@@ -802,13 +820,13 @@ export default function BridgeAdminDashboard() {
               <p className="text-gray-500 text-[11px]">Stop all payouts instantly</p>
             </div>
           )}
-          
+
           {/* Kill Switch Button */}
           <button className="w-full bg-red-600 hover:bg-red-700 text-white rounded-lg flex items-center justify-center gap-2 transition-colors p-2.5 text-xs font-bold">
             <Power size={13} />
             {!collapsed && "STOP ALL PAYOUTS"}
           </button>
-          
+
           {/* Logout Button */}
           <button
             onClick={handleLogout}
@@ -824,32 +842,29 @@ export default function BridgeAdminDashboard() {
       <div className="flex-1 flex flex-col overflow-hidden">
 
         {/* Topbar */}
-        <header className="bg-white border-b border-gray-200 px-5 py-3 flex items-center gap-4 flex-shrink-0 h-14">
+        <header className="bg-white border-b border-gray-200 px-5 py-3 flex items-center gap-4 shrink-0 h-14">
           <button onClick={() => setCollapsed(!collapsed)} className="text-gray-400 hover:text-gray-600 p-1">
             <Menu size={20} />
           </button>
           <div className="flex-1 max-w-lg relative">
             <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-            <input 
+            <input
               className="w-full pl-9 pr-4 py-2 bg-gray-100 rounded-lg text-xs text-gray-600 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-100"
-              placeholder="Search by API name / Merchant / Transaction ID" 
+              placeholder="Search by API name / Merchant / Transaction ID"
             />
             <kbd className="absolute right-3 top-1/2 -translate-y-1/2 text-[10px] text-gray-300 border border-gray-200 rounded px-1">⌘ K</kbd>
           </div>
           <div className="ml-auto flex items-center gap-4">
-            <Sun size={18} className="text-gray-400 cursor-pointer" />
             <div className="relative cursor-pointer">
               <Bell size={20} className="text-gray-400" />
               <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold w-4 h-4 rounded-full flex items-center justify-center">16</span>
             </div>
-            <HelpCircle size={18} className="text-gray-400 cursor-pointer" />
-            <Moon size={17} className="text-gray-400 cursor-pointer" />
-            
+
             {/* User Menu with Dropdown */}
             <div className="relative">
-              <div 
-                className="flex items-center gap-2 cursor-pointer" 
-                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+              <div
+                className="flex items-center gap-2 cursor-pointer"
+              // onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
               >
                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-xs font-bold">SA</div>
                 <div className="hidden md:block">
@@ -858,12 +873,12 @@ export default function BridgeAdminDashboard() {
                 </div>
                 <ChevronDown size={13} className="text-gray-400" />
               </div>
-              
+
               {/* Dropdown Menu */}
               {isUserMenuOpen && (
                 <>
-                  <div 
-                    className="fixed inset-0 z-40" 
+                  <div
+                    className="fixed inset-0 z-40"
                     onClick={() => setIsUserMenuOpen(false)}
                   />
                   <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
@@ -876,7 +891,7 @@ export default function BridgeAdminDashboard() {
                       Security
                     </button>
                     <hr className="my-1" />
-                    <button 
+                    <button
                       onClick={handleLogout}
                       className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                     >

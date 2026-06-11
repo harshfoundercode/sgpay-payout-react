@@ -18,8 +18,6 @@ import {
 } from "recharts";
 
 
-
-
 // Payout pie chart data
 const payoutPie = [
     { name: "Success", value: 71.2, color: "#22c55e" },

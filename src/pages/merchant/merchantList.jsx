@@ -1,29 +1,32 @@
 import { useState } from "react";
+import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 
 // ── Sample Data ──────────────────────────────────────────────────────────────
 const MERCHANTS = [
-  { id: "MER12548", company: "ABC Pvt Ltd",        contact: "Amit Kumar",   mobile: "+91 9876543210", email: "amit.kumar@abc.com",           balance: "₹ 2,45,678.50",  status: "Active",           onboarding: "Approved",   created: "14 May 2025, 10:30 AM" },
-  { id: "MER12547", company: "XYZ Retailers",      contact: "Rohit Sharma", mobile: "+91 9123456780", email: "rohit.sharma@xyz.com",          balance: "₹ 1,85,320.00",  status: "Active",           onboarding: "Approved",   created: "14 May 2025, 09:15 AM" },
-  { id: "MER12546", company: "Global Solutions",   contact: "Neha Verma",   mobile: "+91 9988776655", email: "neha.verma@globals.com",        balance: "₹ 0.00",         status: "Pending Approval", onboarding: "In Review",  created: "13 May 2025, 05:20 PM" },
-  { id: "MER12545", company: "Techno Softwares",   contact: "Vikram Singh", mobile: "+91 9001122334", email: "vikram.singh@techno.com",       balance: "₹ 75,430.75",    status: "Inactive",         onboarding: "Rejected",   created: "13 May 2025, 02:10 PM" },
-  { id: "MER12544", company: "Quick Pay Services", contact: "Priya Patel",  mobile: "+91 9898989898", email: "priya.patel@quickpay.com",      balance: "₹ 3,25,100.25",  status: "Active",           onboarding: "Approved",   created: "12 May 2025, 11:45 AM" },
-  { id: "MER12543", company: "Future Enterprises", contact: "Sanjay Gupta", mobile: "+91 9870098700", email: "sanjay.gupta@future.com",       balance: "₹ 1,20,450.00",  status: "Active",           onboarding: "Approved",   created: "12 May 2025, 10:05 AM" },
-  { id: "MER12542", company: "Digital Store Pvt",  contact: "Karan Mehta",  mobile: "+91 9911223344", email: "karan.mehta@digitalstore.com",  balance: "₹ 56,780.00",    status: "Active",           onboarding: "Approved",   created: "11 May 2025, 04:30 PM" },
-  { id: "MER12541", company: "Skyline Traders",    contact: "Anjali Desai", mobile: "+91 9823456789", email: "anjali.desai@skyline.com",      balance: "₹ 0.00",         status: "Inactive",         onboarding: "On Hold",    created: "11 May 2025, 01:20 PM" },
-  { id: "MER12540", company: "Pay Fast Solutions", contact: "Mohit Jain",   mobile: "+91 9712345678", email: "mohit.jain@payfast.com",        balance: "₹ 8,90,670.45",  status: "Active",           onboarding: "Approved",   created: "10 May 2025, 09:10 AM" },
-  { id: "MER12539", company: "Easy Checkout",      contact: "Ritika Bansal",mobile: "+91 9301234567", email: "ritika.bansal@easycheckout.com",balance: "₹ 45,230.10",    status: "Active",           onboarding: "Approved",   created: "09 May 2025, 06:40 PM" },
+  { id: "MER12548", company: "ABC Pvt Ltd", contact: "Amit Kumar", mobile: "+91 9876543210", email: "amit.kumar@abc.com", balance: "₹ 2,45,678.50", status: "Active", onboarding: "Approved", created: "14 May 2025, 10:30 AM" },
+  { id: "MER12547", company: "XYZ Retailers", contact: "Rohit Sharma", mobile: "+91 9123456780", email: "rohit.sharma@xyz.com", balance: "₹ 1,85,320.00", status: "Active", onboarding: "Approved", created: "14 May 2025, 09:15 AM" },
+  { id: "MER12546", company: "Global Solutions", contact: "Neha Verma", mobile: "+91 9988776655", email: "neha.verma@globals.com", balance: "₹ 0.00", status: "Pending Approval", onboarding: "In Review", created: "13 May 2025, 05:20 PM" },
+  { id: "MER12545", company: "Techno Softwares", contact: "Vikram Singh", mobile: "+91 9001122334", email: "vikram.singh@techno.com", balance: "₹ 75,430.75", status: "Inactive", onboarding: "Rejected", created: "13 May 2025, 02:10 PM" },
+  { id: "MER12544", company: "Quick Pay Services", contact: "Priya Patel", mobile: "+91 9898989898", email: "priya.patel@quickpay.com", balance: "₹ 3,25,100.25", status: "Active", onboarding: "Approved", created: "12 May 2025, 11:45 AM" },
+  { id: "MER12543", company: "Future Enterprises", contact: "Sanjay Gupta", mobile: "+91 9870098700", email: "sanjay.gupta@future.com", balance: "₹ 1,20,450.00", status: "Active", onboarding: "Approved", created: "12 May 2025, 10:05 AM" },
+  { id: "MER12542", company: "Digital Store Pvt", contact: "Karan Mehta", mobile: "+91 9911223344", email: "karan.mehta@digitalstore.com", balance: "₹ 56,780.00", status: "Active", onboarding: "Approved", created: "11 May 2025, 04:30 PM" },
+  { id: "MER12541", company: "Skyline Traders", contact: "Anjali Desai", mobile: "+91 9823456789", email: "anjali.desai@skyline.com", balance: "₹ 0.00", status: "Inactive", onboarding: "On Hold", created: "11 May 2025, 01:20 PM" },
+  { id: "MER12540", company: "Pay Fast Solutions", contact: "Mohit Jain", mobile: "+91 9712345678", email: "mohit.jain@payfast.com", balance: "₹ 8,90,670.45", status: "Active", onboarding: "Approved", created: "10 May 2025, 09:10 AM" },
+  { id: "MER12539", company: "Easy Checkout", contact: "Ritika Bansal", mobile: "+91 9301234567", email: "ritika.bansal@easycheckout.com", balance: "₹ 45,230.10", status: "Active", onboarding: "Approved", created: "09 May 2025, 06:40 PM" },
 ];
 
 // ── Badge Components ──────────────────────────────────────────────────────────
 const STATUS_STYLES = {
-  Active:           "bg-green-100 text-green-700",
-  Inactive:         "bg-red-100 text-red-600",
-  "Pending Approval":"bg-yellow-100 text-yellow-700",
+  Active: "bg-green-100 text-green-700",
+  Inactive: "bg-red-100 text-red-600",
+  "Pending Approval": "bg-yellow-100 text-yellow-700",
 };
 const ONBOARDING_STYLES = {
-  Approved:  "bg-green-100 text-green-700",
-  Rejected:  "bg-red-100 text-red-600",
-  "In Review":"bg-orange-100 text-orange-600",
+  Approved: "bg-green-100 text-green-700",
+  Rejected: "bg-red-100 text-red-600",
+  "In Review": "bg-orange-100 text-orange-600",
   "On Hold": "bg-purple-100 text-purple-700",
 };
 
@@ -53,10 +56,12 @@ function StatCard({ icon, iconBg, label, value, sub, subColor }) {
 
 // ── Main Component ────────────────────────────────────────────────────────────
 export default function MerchantListPage({ onViewDetails }) {
-  const [search, setSearch]   = useState("");
-  const [status, setStatus]   = useState("All Status");
-  const [page, setPage]       = useState(1);
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("All Status");
+  const [page, setPage] = useState(1);
   const totalPages = 125;
+  const navigate = useNavigate();
+
 
   const filtered = MERCHANTS.filter(m =>
     search === "" ||
@@ -84,9 +89,22 @@ export default function MerchantListPage({ onViewDetails }) {
             </svg>
             Export
           </button>
-          <button className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+          <button
+            onClick={() => navigate("/merchants/new")}
+            className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
+          >
+            <svg
+              className="w-4 h-4"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M12 4v16m8-8H4"
+              />
             </svg>
             Add Merchant
           </button>
@@ -200,7 +218,7 @@ export default function MerchantListPage({ onViewDetails }) {
                   <td className="px-4 py-3">
                     <button className="p-1.5 hover:bg-gray-100 rounded-md transition-colors text-gray-400 hover:text-gray-700">
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                        <circle cx="12" cy="5"  r="1.5" />
+                        <circle cx="12" cy="5" r="1.5" />
                         <circle cx="12" cy="12" r="1.5" />
                         <circle cx="12" cy="19" r="1.5" />
                       </svg>
@@ -222,11 +240,11 @@ export default function MerchantListPage({ onViewDetails }) {
                 <option>10</option><option>25</option><option>50</option>
               </select>
             </div>
-            <button onClick={() => setPage(p => Math.max(1, p-1))} disabled={page===1}
+            <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page === 1}
               className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition-colors text-base">‹</button>
-            {[1,2,3].map(p => (
+            {[1, 2, 3].map(p => (
               <button key={p} onClick={() => setPage(p)}
-                className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${page===p ? "bg-blue-600 text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
+                className={`w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-colors ${page === p ? "bg-blue-600 text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-50"}`}>
                 {p}
               </button>
             ))}
@@ -235,7 +253,7 @@ export default function MerchantListPage({ onViewDetails }) {
               className="w-10 h-8 flex items-center justify-center rounded-lg text-sm border border-gray-200 text-gray-600 hover:bg-gray-50 transition-colors">
               {totalPages}
             </button>
-            <button onClick={() => setPage(p => Math.min(totalPages, p+1))}
+            <button onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               className="w-8 h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 transition-colors text-base">›</button>
           </div>
         </div>
