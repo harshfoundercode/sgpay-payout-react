@@ -99,7 +99,7 @@ export default function ChangePassword() {
       newErrors.newPassword = "New password must be different from current password";
     }
     
-    if (Object.keys(newErrors).length > 0) {
+    if (Object.keys(newErrors).length > 0) {  
       setErrors(newErrors);
       return;
     }
