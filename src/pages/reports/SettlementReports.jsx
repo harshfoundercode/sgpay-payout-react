@@ -3,6 +3,7 @@ import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell,
 } from "recharts";
+import DateRangePicker from "../../components/DatePicker";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 const trendData = [
@@ -96,6 +97,26 @@ export default function SettlementReport() {
 
   const total = pieData.reduce((s, d) => s + d.value, 0);
 
+  const [dateRange, setDateRange] = useState(null);
+
+    const handleDateChange = (dateData) => {
+        if (dateData) {
+            setDateRange(dateData);
+            console.log('Date Range Selected:', {
+                startDate: dateData.startDate,
+                endDate: dateData.endDate,
+                startFormatted: dateData.startFormatted,
+                endFormatted: dateData.endFormatted,
+                dateRange: dateData.dateRange
+            });
+            // Fetch data for selected date range here
+            // fetchDashboardData(dateData.startDate, dateData.endDate);
+        } else {
+            console.log('Date range cleared');
+            // Handle clearing date range
+        }
+    };
+
   return (
     <div className="min-h-screen">
 
@@ -111,15 +132,10 @@ export default function SettlementReport() {
       {/* ── Filter Bar ── */}
       <div className="flex items-center gap-3 mb-5 flex-wrap">
         {/* Date Range */}
-        <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-gray-600 cursor-pointer hover:border-gray-300 transition-colors">
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <span className="font-medium text-xs">13 May 2025 - 14 May 2025</span>
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        </div>
+        <DateRangePicker 
+                        onDateChange={handleDateChange}
+                        placeholder="14 May, 2025 - 14 May, 2025"
+                    />
 
         {/* Dropdowns */}
         {["All Merchants", "All APIs", "All Statuses"].map(f => (

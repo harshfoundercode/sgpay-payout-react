@@ -1,7 +1,3 @@
-// PayoutReport.jsx
-// Dependencies: recharts
-// Usage: <PayoutReport />
-
 import { useState } from "react";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -12,6 +8,8 @@ import {
   ArrowLeftRight, Users, Receipt, RefreshCw, Timer,
   Calendar, ChevronDown, Download, ArrowRight, MoreVertical, Info,
 } from "lucide-react";
+import DateRangePicker from "../../components/DatePicker";
+
 
 // ─── DATA ─────────────────────────────────────────────────────────────────────
 
@@ -136,6 +134,26 @@ function LegendRow({ color, name, right }) {
 export default function PayoutReport() {
   const [activePeriod, setActivePeriod] = useState("7D");
 
+  const [dateRange, setDateRange] = useState(null);
+
+    const handleDateChange = (dateData) => {
+        if (dateData) {
+            setDateRange(dateData);
+            console.log('Date Range Selected:', {
+                startDate: dateData.startDate,
+                endDate: dateData.endDate,
+                startFormatted: dateData.startFormatted,
+                endFormatted: dateData.endFormatted,
+                dateRange: dateData.dateRange
+            });
+            // Fetch data for selected date range here
+            // fetchDashboardData(dateData.startDate, dateData.endDate);
+        } else {
+            console.log('Date range cleared');
+            // Handle clearing date range
+        }
+    };
+
   return (
     <div className="min-h-screen text-sm">
 
@@ -146,9 +164,10 @@ export default function PayoutReport() {
           <p className="text-xs text-gray-400 mt-1">Reports &rsaquo; Payout Report</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
-          <button className="flex items-center gap-1.5 border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-600 bg-white hover:bg-gray-50">
-            <Calendar size={13} /> 13 May 2025 – 14 May 2025 <ChevronDown size={11} />
-          </button>
+          <DateRangePicker 
+                        onDateChange={handleDateChange}
+                        placeholder="14 May, 2025 - 14 May, 2025"
+                    />
           <button className="flex items-center gap-1.5 border border-gray-200 rounded-lg px-3 py-2 text-xs text-gray-600 bg-white hover:bg-gray-50">
             All Merchants <ChevronDown size={11} />
           </button>

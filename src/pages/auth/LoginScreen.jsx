@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Check, Shield, Bus } from 'lucide-react';
-import busImage from '../../assets/login.png';
+import busImage from '../../assets/logintwo.png';
 
 
 const BridgeLogin = () => {
@@ -88,16 +88,16 @@ const BridgeLogin = () => {
             )}
 
             {/* LEFT SIDE - FULL HEIGHT BUS IMAGE */}
-            <div className="hidden lg:flex lg:w-1/2 h-full relative overflow-hidden bg-linear-to-br from-gray-900 to-gray-800">
+            <div className="hidden lg:flex lg:w-[500px] h-full relative overflow-hidden bg-linear-to-br from-gray-900 to-gray-800">
                 <img
                     src={busImage}
                     alt="Luxury Bus Fleet"
-                    className="w-full h-full object-fill object-center"
+                    className="w-full h-full object-fill"
                 />
             </div>
 
             {/* RIGHT SIDE - PERFECTLY CENTERED LOGIN FORM */}
-            <div className="w-full lg:w-1/2 h-full flex items-center justify-center p-4 md:p-8 overflow-hidden bg-linear-to-br from-white to-gray-50">
+            <div className="w-full h-full flex items-center justify-center p-4 md:p-8 overflow-hidden bg-gray-50">
                 <div className="w-full max-w-md mx-auto">
                     {/* Logo/Brand */}
                     <div className="text-center mb-8">
@@ -187,9 +187,9 @@ const BridgeLogin = () => {
                         </button>
                     </form>
 
-                
 
-                    
+
+
                 </div>
             </div>
         </div>

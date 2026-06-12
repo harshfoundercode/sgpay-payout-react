@@ -166,13 +166,7 @@ export default function AutoPayout() {
             rows={merchantRows}
             onToggle={toggleMerchant}
           />
-          <TableSection
-            title="Payout API Auto Payout Settings"
-            searchPlaceholder="Search Payout API"
-            headers={apiHeaders}
-            rows={apiRows}
-            onToggle={toggleApi}
-          />
+         
         </>
       ) : (
         <TableSection

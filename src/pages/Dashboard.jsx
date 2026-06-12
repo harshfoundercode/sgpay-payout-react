@@ -347,7 +347,7 @@ function RecentTransactionsTable({ data }) {
                 <thead>
                     <tr className="text-black border-b border-gray-100  bg-[#F7F8FA]">
                         {["Txn ID", "Merchant", "Amount", "Status", "Time"].map(h => (
-                            <th key={h} className="text-left pb-2 font-medium">{h}</th>
+                            <th key={h} className="text-left pl-2 pt-2 pb-0.5  font-medium">{h}</th>
                         ))}
                     </tr>
                 </thead>

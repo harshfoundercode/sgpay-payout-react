@@ -3,6 +3,7 @@ import {
   LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, BarChart, Bar, CartesianGrid, Legend,
 } from "recharts";
+import DateRangePicker from "../../components/DatePicker";
 
 // ── Data ──────────────────────────────────────────────────────────────────────
 const trendData = [
@@ -56,7 +57,7 @@ const hourlyData = [
 function TrendTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-md text-xs">
+    <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs">
       <p className="font-semibold text-gray-700 mb-1">{label}</p>
       {payload.map(p => (
         <p key={p.name} style={{ color: p.color }}>
@@ -70,7 +71,7 @@ function TrendTooltip({ active, payload, label }) {
 function BarTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   return (
-    <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 shadow-md text-xs">
+    <div className="bg-white border border-gray-200 rounded-lg px-3 py-2 text-xs">
       <p className="font-semibold text-gray-700 mb-1">{label}</p>
       {payload.map(p => (
         <p key={p.name} style={{ color: p.color }}>
@@ -85,7 +86,7 @@ function BarTooltip({ active, payload, label }) {
 function StatCard({ iconBg, icon, label, value, ratePct, rateColor, changePct, changeDir, sub }) {
   const up = changeDir === "up";
   return (
-    <div className="bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+    <div className="bg-white rounded-xl border border-gray-100 p-4">
       <div className="flex items-start gap-3">
         <div className={`w-11 h-11 ${iconBg} rounded-full flex items-center justify-center flex-shrink-0`}>
           {icon}
@@ -113,6 +114,25 @@ export default function SuccessFailureReport() {
 
   const total = distributionData.reduce((s, d) => s + d.value, 0);
 
+  const [dateRange, setDateRange] = useState(null);
+
+    const handleDateChange = (dateData) => {
+        if (dateData) {
+            setDateRange(dateData);
+            console.log('Date Range Selected:', {
+                startDate: dateData.startDate,
+                endDate: dateData.endDate,
+                startFormatted: dateData.startFormatted,
+                endFormatted: dateData.endFormatted,
+                dateRange: dateData.dateRange
+            });
+            // Fetch data for selected date range here
+            // fetchDashboardData(dateData.startDate, dateData.endDate);
+        } else {
+            console.log('Date range cleared');
+            // Handle clearing date range
+        }
+    };
   return (
     <div className="min-h-screen">
 
@@ -127,19 +147,13 @@ export default function SuccessFailureReport() {
 
       {/* ── Filter Bar ── */}
       <div className="flex items-center gap-3 mb-5 flex-wrap">
-        <div className="flex items-center gap-2 px-3 py-2 bg-white border border-gray-200 rounded-lg text-xs text-gray-600 cursor-pointer hover:border-gray-300 shadow-sm">
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-          <span className="font-medium">13 May 2025 - 14 May 2025</span>
-          <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-          </svg>
-        </div>
-
+        <DateRangePicker 
+                        onDateChange={handleDateChange}
+                        placeholder="14 May, 2025 - 14 May, 2025"
+                    />
         {["All Merchants", "All APIs", "All Statuses"].map(f => (
           <div key={f} className="relative">
-            <select className="appearance-none pl-3 pr-8 py-2 text-xs text-gray-600 bg-white border border-gray-200 rounded-lg focus:outline-none shadow-sm cursor-pointer hover:border-gray-300">
+            <select className="appearance-none pl-3 pr-8 py-2 text-xs text-gray-600 bg-white border border-gray-200 rounded-lg focus:outline-none cursor-pointer hover:border-gray-300">
               <option>{f}</option>
             </select>
             <svg className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -148,10 +162,10 @@ export default function SuccessFailureReport() {
           </div>
         ))}
 
-        <button className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors shadow-sm">
+        <button className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg transition-colors ">
           Apply Filter
         </button>
-        <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-xs font-medium text-gray-700 rounded-lg transition-colors shadow-sm">
+        <button className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-xs font-medium text-gray-700 rounded-lg transition-colors ">
           <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
@@ -205,7 +219,7 @@ export default function SuccessFailureReport() {
       <div className="grid grid-cols-12 gap-4 mb-4">
 
         {/* Success vs Failure Trend */}
-        <div className="col-span-7 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+        <div className="col-span-7 bg-white rounded-xl border border-gray-100  p-4">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-sm font-semibold text-gray-800">Success vs Failure Trend</h2>
             <div className="flex gap-1">
@@ -256,7 +270,7 @@ export default function SuccessFailureReport() {
         </div>
 
         {/* Success vs Failure Distribution */}
-        <div className="col-span-5 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+        <div className="col-span-5 bg-white rounded-xl border border-gray-100 p-4">
           <h2 className="text-sm font-semibold text-gray-800 mb-3">Success vs Failure Distribution</h2>
           <div className="flex items-center gap-5">
             {/* Donut */}
@@ -292,7 +306,7 @@ export default function SuccessFailureReport() {
       <div className="grid grid-cols-12 gap-4">
 
         {/* Failure Reasons */}
-        <div className="col-span-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+        <div className="col-span-4 bg-white rounded-xl border border-gray-100 p-4">
           <h2 className="text-sm font-semibold text-gray-800 mb-3">Failure Reasons</h2>
           <div className="flex items-center gap-4">
             {/* Pie */}
@@ -330,7 +344,7 @@ export default function SuccessFailureReport() {
         </div>
 
         {/* Failure by API */}
-        <div className="col-span-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+        <div className="col-span-4 bg-white rounded-xl border border-gray-100 p-4">
           <h2 className="text-sm font-semibold text-gray-800 mb-3">Failure by API</h2>
           <table className="w-full text-xs">
             <thead>
@@ -368,7 +382,7 @@ export default function SuccessFailureReport() {
         </div>
 
         {/* Hourly Success vs Failure */}
-        <div className="col-span-4 bg-white rounded-xl border border-gray-100 shadow-sm p-4">
+        <div className="col-span-4 bg-white rounded-xl border border-gray-100 p-4">
           <div className="flex items-center justify-between mb-2">
             <h2 className="text-sm font-semibold text-gray-800">Hourly Success vs Failure</h2>
             <div className="relative">

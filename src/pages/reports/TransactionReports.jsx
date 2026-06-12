@@ -3,6 +3,7 @@ import {
     LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip,
     ResponsiveContainer, PieChart, Pie, Cell, Legend
 } from "recharts";
+import DateRangePicker from "../../components/DatePicker";
 
 // ── Stat Card ────────────────────────────────────────────────────────────────
 const StatCard = ({ icon, iconBg, label, value, change, changeColor, sub }) => (
@@ -229,6 +230,26 @@ export default function ReportsOverview() {
         return v;
     };
 
+    const [dateRange, setDateRange] = useState(null);
+
+    const handleDateChange = (dateData) => {
+        if (dateData) {
+            setDateRange(dateData);
+            console.log('Date Range Selected:', {
+                startDate: dateData.startDate,
+                endDate: dateData.endDate,
+                startFormatted: dateData.startFormatted,
+                endFormatted: dateData.endFormatted,
+                dateRange: dateData.dateRange
+            });
+            // Fetch data for selected date range here
+            // fetchDashboardData(dateData.startDate, dateData.endDate);
+        } else {
+            console.log('Date range cleared');
+            // Handle clearing date range
+        }
+    };
+
     return (
         <div className="min-h-screen">
 
@@ -240,11 +261,10 @@ export default function ReportsOverview() {
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                     {/* Date range */}
-                    <div className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg bg-white text-xs text-gray-700 cursor-pointer hover:bg-gray-50">
-                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
-                        13 May 2025 – 14 May 2025
-                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></svg>
-                    </div>
+                    <DateRangePicker 
+                        onDateChange={handleDateChange}
+                        placeholder="14 May, 2025 - 14 May, 2025"
+                    />
                     <Select options={["All Merchants", "Premium", "Standard"]} />
                     <Select options={["All APIs", "RazorpayX", "Cashfree", "Paytm"]} />
                     <Select options={["All Status", "Active", "Inactive"]} />

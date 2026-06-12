@@ -1,4 +1,5 @@
 import { useState } from "react";
+import DateRangePicker from "../components/DatePicker";
 
 // ─── Icons (inline SVG helpers) ────────────────────────────────────────────
 const Icon = ({ d, size = 16, className = "" }) => (
@@ -115,151 +116,170 @@ const TransactionsPage = ({ onViewDetails }) => {
     const [activeTab, setActiveTab] = useState("All");
     const [openMenu, setOpenMenu] = useState(null);
 
+    const [dateRange, setDateRange] = useState(null);
+
+    const handleDateChange = (dateData) => {
+        if (dateData) {
+            setDateRange(dateData);
+            console.log('Date Range Selected:', {
+                startDate: dateData.startDate,
+                endDate: dateData.endDate,
+                startFormatted: dateData.startFormatted,
+                endFormatted: dateData.endFormatted,
+                dateRange: dateData.dateRange
+            });
+            // Fetch data for selected date range here
+            // fetchDashboardData(dateData.startDate, dateData.endDate);
+        } else {
+            console.log('Date range cleared');
+            // Handle clearing date range
+        }
+    };
+
     return (
-        <div className="p-1">
-            {/* Header */}
-            <div className="flex items-center justify-between mb-5">
-                <div>
-                    <h1 className="text-xl font-bold text-gray-900">Transactions</h1>
-                    <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-0.5">
-                        <span className="hover:text-blue-600 cursor-pointer">Dashboard</span>
-                        <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M9 18l6-6-6-6" /></svg>
-                        <span className="text-gray-800">Transactions</span>
-                    </div>
-                </div>
-                <div className="flex items-center gap-2">
-                    <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
-                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d={icons.download} /></svg>
-                        Export
-                    </button>
-                    <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm">
-                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d={icons.filter} /></svg>
-                        Filters
-                    </button>
-                </div>
-            </div>
-
-            {/* Filters */}
-            <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-4">
-                <div className="flex flex-wrap gap-3 mb-3">
-                    {/* Date */}
-                    <div className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm text-black font-semibold cursor-pointer hover:bg-gray-50 bg-white">
-                        <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><rect x="3" y="4" width="18" height="18" rx="2" ry="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></svg>
-                        14 May, 2025 - 14 May, 2025
-                    </div>
-                    {["All Status", "All APIs", "All Merchants", "All Users"].map((f) => (
-                        <div key={f} className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-sm text-black font-semibold cursor-pointer hover:bg-gray-50 bg-white min-w-[120px]">
-                            <span className="flex-1">{f}</span>
-                            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M19 9l-7 7-7-7" /></svg>
+        <div className="p-0">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-5">
+                    <div>
+                        <h1 className="text-xl font-bold text-gray-900">Transactions</h1>
+                        <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-0.5">
+                            <span className="hover:text-blue-600 cursor-pointer">Dashboard</span>
+                            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M9 18l6-6-6-6" /></svg>
+                            <span className="text-gray-800">Transactions</span>
                         </div>
-                    ))}
-                </div>
-                <div className="flex flex-wrap gap-3">
-                    <input className="px-3 py-2 border border-gray-200 rounded-lg text-sm w-36 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 placeholder:text-gray-700" placeholder="Min Amount" />
-                    <span className="flex items-center text-sm text-gray-700">to</span>
-                    <input className="px-3 py-2 border border-gray-200 rounded-lg text-sm w-36 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 placeholder:text-gray-700" placeholder="Max Amount" />
-                    <input className="px-3 py-2 border border-gray-200 rounded-lg text-sm flex-1 min-w-[250px] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 placeholder:text-gray-700" placeholder="Transaction ID / Order ID / UTR / Ref No." />
-                    <div className="flex gap-2 ml-auto">
-                        <button className="px-4 py-2 border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-50 transition-colors">Reset</button>
-                        <button className="px-4 py-2 border border-blue-300 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-50 transition-colors">Save Filter</button>
                     </div>
-                </div>
-            </div>
-
-            {/* Tabs */}
-            <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-                <div className="flex border-b border-gray-100 px-4 pt-3 pb-3 gap-1 overflow-x-auto overflow-hidden hide-scrollbar">
-                    {tabs.map((tab) => (
-                        <button
-                            key={tab.label}
-                            onClick={() => setActiveTab(tab.label)}
-                            className={`flex flex-col items-center px-5 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap border ${activeTab === tab.label
-                                ? "bg-[#ECF2FE] text-blue-600 border-blue-500"
-                                : " text-gray-600 border-gray-100 hover:bg-blue-100"
-                                }`}
-                        >
-                            <span>{tab.label}</span>
-                            <span className={`text-xs font-bold mt-0.5 ${activeTab === tab.label ? "text-blue-600" : tab.color}`}>{tab.count}</span>
+                    <div className="flex items-center gap-2">
+                        <button className="flex items-center gap-2 px-4 py-2 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
+                            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d={icons.download} /></svg>
+                            Export
                         </button>
-                    ))}
-                </div>
-
-                {/* Table */}
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead>
-                            <tr className="bg-gray-50 border-b border-gray-100">
-                                <th className="w-10 px-4 py-3"> <span className="flex items-center text-sm text-gray-700">#</span></th>
-                                {["Txn ID", "Order ID", "Merchant", "User", "Beneficiary", "Amount", "API Used", "Status", "UTR / Reference No.", "Created At", "Actions"].map((h) => (
-                                    <th key={h} className="px-3 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">{h}</th>
-                                ))}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {transactions.map((txn) => (
-                                <tr key={txn.id} className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors group">
-                                    <td className="px-4 py-3"> <span className="flex items-center text-sm text-gray-700">{txn.no}</span></td>
-                                    <td className="px-3 py-3 text-xs font-mono text-blue-600 whitespace-nowrap cursor-pointer hover:underline" onClick={() => onViewDetails(txn)}>{txn.id}</td>
-                                    <td className="px-3 py-3 text-xs text-gray-600 font-mono whitespace-nowrap">{txn.orderId}</td>
-                                    <td className="px-3 py-3 text-xs text-gray-800 font-medium whitespace-nowrap">{txn.merchant}</td>
-                                    <td className="px-3 py-3 text-xs text-gray-700 whitespace-nowrap">{txn.user}</td>
-                                    <td className="px-3 py-3">
-                                        <div className="text-xs font-medium text-gray-800">{txn.beneficiary}</div>
-                                        <div className="text-[11px] text-gray-500">{txn.phone}</div>
-                                    </td>
-                                    <td className="px-3 py-3 text-xs font-semibold text-gray-900 whitespace-nowrap">{txn.amount}</td>
-                                    <td className="px-3 py-3 whitespace-nowrap"><ApiLogo api={txn.api} /></td>
-                                    <td className="px-3 py-3"><StatusBadge status={txn.status} /></td>
-                                    <td className="px-3 py-3 text-xs text-gray-600 font-mono whitespace-nowrap">{txn.utr}</td>
-                                    <td className="px-3 py-3">
-                                        <div className="text-xs text-gray-800">{txn.date}</div>
-                                        <div className="text-[11px] text-gray-500">{txn.time}</div>
-                                    </td>
-                                    <td className="px-3 py-3 relative">
-                                        <button
-                                            onClick={() => setOpenMenu(openMenu === txn.id ? null : txn.id)}
-                                            className="p-1.5 rounded-lg hover:bg-gray-200 text-gray-500 transition-colors"
-                                        >
-                                            <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="12" cy="19" r="1.5" /></svg>
-                                        </button>
-                                        {openMenu === txn.id && (
-                                            <ActionMenu onViewDetails={() => { onViewDetails(txn); setOpenMenu(null); }} />
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
-
-                {/* Pagination */}
-                <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
-                    <div className="flex items-center gap-2 text-sm text-gray-600">
-                        <span>Rows per page:</span>
-                        <select className="border border-gray-200 rounded px-2 py-1 text-sm">
-                            <option>10</option><option>25</option><option>50</option>
-                        </select>
+                        <button className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-semibold transition-colors shadow-sm">
+                            <svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d={icons.filter} /></svg>
+                            Filters
+                        </button>
                     </div>
-                    <span className="text-xs text-gray-500">Showing 1 to 10 of 12,45,678 transactions</span>
-                    <div className="flex items-center gap-1">
-                        <button className="p-1.5 rounded border border-gray-200 text-gray-500 hover:bg-gray-50"><svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M15 18l-6-6 6-6" /></svg></button>
-                        {[1, 2, 3].map((p) => (
-                            <button key={p} className={`w-8 h-8 rounded text-xs font-medium ${p === 1 ? "bg-blue-600 text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-50"}`}>{p}</button>
+                </div>
+
+                {/* Filters */}
+                <div className="bg-white rounded-2xl border border-gray-100 p-4 mb-4">
+                    <div className="flex flex-wrap gap-3 mb-3">
+                        <DateRangePicker 
+                        onDateChange={handleDateChange}
+                        placeholder="14 May, 2025 - 14 May, 2025"
+                    />
+                        {["All Status", "All APIs", "All Merchants", "All Users"].map((f) => (
+                            <div key={f} className="flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg text-xs text-black font-semibold cursor-pointer hover:bg-gray-50 bg-white min-w-[120px]">
+                                <span className="flex-1">{f}</span>
+                                <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M19 9l-7 7-7-7" /></svg>
+                            </div>
                         ))}
-                        <span className="text-gray-400 px-1">...</span>
-                        <button className="w-8 h-8 rounded border border-gray-200 text-xs text-gray-600 hover:bg-gray-50">124568</button>
-                        <button className="p-1.5 rounded border border-gray-200 text-gray-500 hover:bg-gray-50"><svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M9 18l6-6-6-6" /></svg></button>
+                    </div>
+                    <div className="flex flex-wrap gap-3">
+                        <input className="px-3 py-2 border border-gray-200 rounded-lg text-xs w-36 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 placeholder:text-gray-700" placeholder="Min Amount" />
+                        <span className="flex items-center text-sm text-gray-700">to</span>
+                        <input className="px-3 py-2 border border-gray-200 rounded-lg text-xs w-36 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 placeholder:text-gray-700" placeholder="Max Amount" />
+                        <input className="px-3 py-2 border border-gray-200 rounded-lg text-xs flex-1 min-w-[250px] focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 placeholder:text-gray-700" placeholder="Transaction ID / Order ID / UTR / Ref No." />
+                        <div className="flex gap-2 ml-auto">
+                            <button className="px-4 py-2 border border-gray-200 rounded-lg text-xs text-gray-700 hover:bg-gray-50 transition-colors">Reset</button>
+                            <button className="px-4 py-2 border border-blue-300 text-blue-700 rounded-lg text-xs font-medium hover:bg-blue-50 transition-colors">Save Filter</button>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Tabs & Table Container - NO overflow on this div */}
+                <div className="bg-white rounded-2xl border border-gray-100">
+                    <div className="flex border-b border-gray-100 px-4 pt-3 pb-3 gap-1 overflow-x-auto hide-scrollbar">
+                        {tabs.map((tab) => (
+                            <button
+                                key={tab.label}
+                                onClick={() => setActiveTab(tab.label)}
+                                className={`flex flex-col items-center px-5 py-2.5 rounded-lg text-sm font-medium transition-colors whitespace-nowrap border ${activeTab === tab.label
+                                    ? "bg-[#ECF2FE] text-blue-600 border-blue-500"
+                                    : " text-gray-600 border-gray-100 hover:bg-blue-100"
+                                    }`}
+                            >
+                                <span>{tab.label}</span>
+                                <span className={`text-xs font-bold mt-0.5 ${activeTab === tab.label ? "text-blue-600" : tab.color}`}>{tab.count}</span>
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Table with horizontal scroll only */}
+                    <div className="overflow-x-auto">
+                        <table className="w-full min-w-[1200px]">
+                            <thead>
+                                <tr className="bg-gray-50 border-b border-gray-100">
+                                    <th className="w-10 px-4 py-3"> <span className="flex items-center text-sm text-gray-700">#</span></th>
+                                    {["Txn ID", "Order ID", "Merchant", "User", "Beneficiary", "Amount", "API Used", "Status", "UTR / Reference No.", "Created At", "Actions"].map((h) => (
+                                        <th key={h} className="px-3 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap">{h}</th>
+                                    ))}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {transactions.map((txn) => (
+                                    <tr key={txn.id} className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors group">
+                                        <td className="px-4 py-3"> <span className="flex items-center text-sm text-gray-700">{txn.no}</span></td>
+                                        <td className="px-3 py-3 text-xs font-mono text-blue-600 whitespace-nowrap cursor-pointer hover:underline" onClick={() => onViewDetails(txn)}>{txn.id}</td>
+                                        <td className="px-3 py-3 text-xs text-gray-600 font-mono whitespace-nowrap">{txn.orderId}</td>
+                                        <td className="px-3 py-3 text-xs text-gray-800 font-medium whitespace-nowrap">{txn.merchant}</td>
+                                        <td className="px-3 py-3 text-xs text-gray-700 whitespace-nowrap">{txn.user}</td>
+                                        <td className="px-3 py-3">
+                                            <div className="text-xs font-medium text-gray-800">{txn.beneficiary}</div>
+                                            <div className="text-[11px] text-gray-500">{txn.phone}</div>
+                                        </td>
+                                        <td className="px-3 py-3 text-xs font-semibold text-gray-900 whitespace-nowrap">{txn.amount}</td>
+                                        <td className="px-3 py-3 whitespace-nowrap"><ApiLogo api={txn.api} /></td>
+                                        <td className="px-3 py-3"><StatusBadge status={txn.status} /></td>
+                                        <td className="px-3 py-3 text-xs text-gray-600 font-mono whitespace-nowrap">{txn.utr}</td>
+                                        <td className="px-3 py-3">
+                                            <div className="text-xs text-gray-800">{txn.date}</div>
+                                            <div className="text-[11px] text-gray-500">{txn.time}</div>
+                                        </td>
+                                        <td className="px-3 py-3 relative">
+                                            <button
+                                                onClick={() => setOpenMenu(openMenu === txn.id ? null : txn.id)}
+                                                className="p-1.5 rounded-lg hover:bg-gray-200 text-gray-500 transition-colors"
+                                            >
+                                                <svg width={16} height={16} viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="5" r="1.5" /><circle cx="12" cy="12" r="1.5" /><circle cx="12" cy="19" r="1.5" /></svg>
+                                            </button>
+                                            {openMenu === txn.id && (
+                                                <ActionMenu onViewDetails={() => { onViewDetails(txn); setOpenMenu(null); }} />
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* Pagination */}
+                    <div className="flex items-center justify-between px-4 py-3 border-t border-gray-100">
+                        <div className="flex items-center gap-2 text-sm text-gray-600">
+                            <span>Rows per page:</span>
+                            <select className="border border-gray-200 rounded px-2 py-1 text-sm">
+                                <option>10</option><option>25</option><option>50</option>
+                            </select>
+                        </div>
+                        <span className="text-xs text-gray-500">Showing 1 to 10 of 12,45,678 transactions</span>
+                        <div className="flex items-center gap-1">
+                            <button className="p-1.5 rounded border border-gray-200 text-gray-500 hover:bg-gray-50"><svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M15 18l-6-6 6-6" /></svg></button>
+                            {[1, 2, 3].map((p) => (
+                                <button key={p} className={`w-8 h-8 rounded text-xs font-medium ${p === 1 ? "bg-blue-600 text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-50"}`}>{p}</button>
+                            ))}
+                            <span className="text-gray-400 px-1">...</span>
+                            <button className="w-8 h-8 rounded border border-gray-200 text-xs text-gray-600 hover:bg-gray-50">124568</button>
+                            <button className="p-1.5 rounded border border-gray-200 text-gray-500 hover:bg-gray-50"><svg width={14} height={14} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M9 18l6-6-6-6" /></svg></button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
     );
 };
 
 // ─── Transaction Details Page ──────────────────────────────────────────────
 const InfoRow = ({ label, value, mono }) => (
     <div className="flex py-1.5">
-        <span className="text-xs text-gray-500 w-32 flex-shrink-0">{label}</span>
+        <span className="text-xs text-gray-800 font-semibold w-32 flex-shrink-0">{label}</span>
         <span className="text-gray-300 mx-2">:</span>
         <span className={`text-xs font-medium text-gray-800 ${mono ? "font-mono" : ""}`}>{value || "–"}</span>
     </div>
@@ -285,8 +305,7 @@ const TransactionDetails = ({ txn, onBack }) => {
     const detailTabs = ["Overview"];
 
     return (
-        <div className="flex-1 overflow-auto hide-scrollbar bg-gray-50">
-            <div className="p-1">
+         <div className="p-0">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-5">
                     <div>
@@ -344,8 +363,8 @@ const TransactionDetails = ({ txn, onBack }) => {
                     </div>
                 </div>
 
-                {/* Tabs */}
-                <div className="bg-white rounded-2xl  border border-gray-100 overflow-hidden">
+                {/* Tabs & Content */}
+                <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
                     <div className="flex border-b border-gray-100 px-4 overflow-x-auto">
                         {detailTabs.map((tab) => (
                             <button
@@ -497,7 +516,6 @@ const TransactionDetails = ({ txn, onBack }) => {
                     )}
                 </div>
             </div>
-        </div>
     );
 };
 
@@ -517,13 +535,12 @@ export default function TransactionScreen() {
     };
 
     return (
-        <div className="flex h-screen overflow-auto hide-scrollbar">
-
+        <div className="w-full bg-gray-50">
             {page === "transactions" ? (
-                    <TransactionsPage onViewDetails={handleViewDetails} />
-                ) : (
-                    <TransactionDetails txn={selectedTxn} onBack={handleBack} />
-                )}
+                <TransactionsPage onViewDetails={handleViewDetails} />
+            ) : (
+                <TransactionDetails txn={selectedTxn} onBack={handleBack} />
+            )}
         </div>
     );
 }
