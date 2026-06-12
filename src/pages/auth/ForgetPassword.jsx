@@ -719,6 +719,36 @@ export default function ForgotPassword() {
     return () => clearInterval(id);
   }, [timer]);
 
+  // ── Clear field-specific errors when user types ──
+  const handleEmailChange = (e) => {
+    setEmail(e.target.value);
+    if (errors.email) {
+      setErrors(prev => ({ ...prev, email: null }));
+    }
+  };
+
+  const handleNewPwChange = (e) => {
+    setNewPw(e.target.value);
+    if (errors.newPw) {
+      setErrors(prev => ({ ...prev, newPw: null }));
+    }
+    // Also clear confirm password error if it exists
+    if (errors.confirmPw && confirmPw === e.target.value) {
+      setErrors(prev => ({ ...prev, confirmPw: null }));
+    }
+  };
+
+  const handleConfirmPwChange = (e) => {
+    setConfirmPw(e.target.value);
+    if (errors.confirmPw) {
+      setErrors(prev => ({ ...prev, confirmPw: null }));
+    }
+    // Clear new password error if both are now valid
+    if (errors.newPw && e.target.value === newPw && newPw.length >= 8) {
+      setErrors(prev => ({ ...prev, newPw: null }));
+    }
+  };
+
   // ── actions ──
 
   const sendOTP = async () => {
@@ -921,15 +951,14 @@ export default function ForgotPassword() {
         {/* scrollable content */}
         <div className="flex-1 px-8 pb-6 w-full">
           
-          {/* ── STEPPER (full width, unchanged) ── */}
-          <div className="flex items-start mb-7 mt-2">
+          {/* ── STEPPER ── */}
+          <div className="w-full max-w-2xl mx-auto flex items-start mb-7 mt-2 px-4">
             {STEPS.map(({ n, label }, i) => {
               const isDone = step > n;
               const isActive = step === n;
               return (
                 <React.Fragment key={n}>
                   <div className="flex flex-col items-center gap-2 flex-1 min-w-0">
-                    {/* circle */}
                     <div className={`
                       w-10 h-10 rounded-full flex items-center justify-center
                       text-[14px] font-bold border-2 transition-all duration-200 flex-shrink-0
@@ -939,7 +968,6 @@ export default function ForgotPassword() {
                     `}>
                       {isDone ? <CheckCircle size={17} /> : n}
                     </div>
-                    {/* label */}
                     <span className={`
                       text-[12px] font-medium text-center truncate w-full px-1
                       ${isDone || isActive ? "text-indigo-600 font-semibold" : "text-gray-400"}
@@ -947,8 +975,6 @@ export default function ForgotPassword() {
                       {label}
                     </span>
                   </div>
-
-                  {/* connector line */}
                   {i < STEPS.length - 1 && (
                     <div className={`
                       flex-1 h-0.5 mt-5 transition-all duration-300
@@ -960,7 +986,7 @@ export default function ForgotPassword() {
             })}
           </div>
 
-          {/* ── ACCORDION CARDS (half width, centered) ── */}
+          {/* ── ACCORDION CARDS ── */}
           <div className="flex justify-center">
             <div className="w-full max-w-lg space-y-3.5">
               {CARDS.map(({ n, icon, title, sub }) => {
@@ -972,10 +998,8 @@ export default function ForgotPassword() {
                     key={n}
                     className="border-[1.5px] border-gray-200 rounded-2xl overflow-hidden bg-white transition-all duration-200"
                   >
-                    {/* card header */}
                     <div className="flex items-center justify-between px-5 py-4">
                       <div className="flex items-center gap-3.5">
-                        {/* icon badge */}
                         <div className={`
                           w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0
                           ${iconBg(n)}
@@ -992,7 +1016,6 @@ export default function ForgotPassword() {
                       {!isOpen && <ChevronDown size={17} className="text-gray-400 flex-shrink-0" />}
                     </div>
 
-                    {/* card body — only active step */}
                     {isOpen && (
                       <div className="px-5 pb-5 border-t border-gray-100">
 
@@ -1005,7 +1028,7 @@ export default function ForgotPassword() {
                             <input
                               type="email"
                               value={email}
-                              onChange={(e) => setEmail(e.target.value)}
+                              onChange={handleEmailChange}
                               onKeyDown={(e) => e.key === "Enter" && sendOTP()}
                               placeholder="Enter your registered email"
                               className={`
@@ -1060,7 +1083,6 @@ export default function ForgotPassword() {
                         {/* ════ STEP 2 ════ */}
                         {n === 2 && (
                           <>
-                            {/* email strip */}
                             <div className="flex items-center justify-between bg-gray-50 border-[1.5px] border-gray-200 rounded-xl px-4 py-3 mt-4">
                               <div className="flex items-center gap-3">
                                 <Mail size={15} className="text-gray-400" />
@@ -1095,7 +1117,6 @@ export default function ForgotPassword() {
                               ))}
                             </div>
 
-                            {/* resend row */}
                             <div className="flex items-center justify-between mt-3">
                               <p className="text-[12px] text-gray-500">
                                 Didn't receive the OTP?{" "}
@@ -1148,7 +1169,6 @@ export default function ForgotPassword() {
                         {/* ════ STEP 3 ════ */}
                         {n === 3 && (
                           <>
-                            {/* new password */}
                             <p className="text-[13px] font-semibold text-gray-700 mt-4 mb-1.5">
                               New Password
                             </p>
@@ -1156,7 +1176,7 @@ export default function ForgotPassword() {
                               <input
                                 type={showPw ? "text" : "password"}
                                 value={newPw}
-                                onChange={(e) => setNewPw(e.target.value)}
+                                onChange={handleNewPwChange}
                                 placeholder="Enter new password"
                                 className={`
                                   w-full px-4 py-3 pr-11 text-[14px] text-gray-900
@@ -1180,7 +1200,6 @@ export default function ForgotPassword() {
                               </p>
                             )}
 
-                            {/* confirm password */}
                             <p className="text-[13px] font-semibold text-gray-700 mt-4 mb-1.5">
                               Confirm New Password
                             </p>
@@ -1188,7 +1207,7 @@ export default function ForgotPassword() {
                               <input
                                 type={showCpw ? "text" : "password"}
                                 value={confirmPw}
-                                onChange={(e) => setConfirmPw(e.target.value)}
+                                onChange={handleConfirmPwChange}
                                 placeholder="Confirm new password"
                                 className={`
                                   w-full px-4 py-3 pr-11 text-[14px] text-gray-900
@@ -1212,7 +1231,6 @@ export default function ForgotPassword() {
                               </p>
                             )}
 
-                            {/* hint */}
                             <div className="flex items-start gap-2 mt-3.5 bg-blue-50 border border-blue-200 rounded-xl px-4 py-3">
                               <Info size={14} className="text-blue-500 mt-0.5 flex-shrink-0" />
                               <p className="text-[12px] text-blue-600 leading-relaxed">

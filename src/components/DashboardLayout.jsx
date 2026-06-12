@@ -943,8 +943,7 @@ const navConfig = [
     {
         id: "settings", label: "Settings", Icon: Settings, hasChevron: true,
         sub: [
-            { id: "profile-settings", path: "/profile-settings", label: "Profile Settings", Icon: UserCheck },
-            { id: "system-settings",  path: "/system-settings",  label: "System Settings",  Icon: Wrench },
+            { id: "change-password", path: "/change-password", label: "Change Password", Icon: UserCheck },
         ]
     },
 ];

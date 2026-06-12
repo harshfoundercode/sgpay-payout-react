@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Navigate,useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 
 // ── Sample Data ──────────────────────────────────────────────────────────────
@@ -68,6 +68,9 @@ export default function MerchantListPage() {
     m.company.toLowerCase().includes(search.toLowerCase()) ||
     m.contact.toLowerCase().includes(search.toLowerCase())
   );
+  const [selectedStatus, setSelectedStatus] = useState("All Status");
+
+  const statusOptions = ["All Status", "Active", "Inactive", "Pending", "Completed", "Cancelled"];
 
   return (
     <div className="min-h-screen">
@@ -157,23 +160,21 @@ export default function MerchantListPage() {
             </svg>
           </div>
 
-          {["All Status", "All Types"].map(f => (
-            <div key={f} className="relative">
-              <select className="appearance-none pl-3 pr-8 py-2 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer">
-                <option>{f}</option>
-              </select>
-              <svg className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </div>
-          ))}
+          <div className="relative">
+  <select 
+    value={selectedStatus}
+    onChange={(e) => setSelectedStatus(e.target.value)}
+    className="appearance-none pl-3 pr-8 py-2 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer"
+  >
+    {statusOptions.map(option => (
+      <option key={option} value={option}>{option}</option>
+    ))}
+  </select>
+  <svg className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+  </svg>
+</div>
 
-          <button className="flex items-center gap-1.5 px-3 py-2 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-            </svg>
-            More Filters
-          </button>
 
           <button className="ml-auto flex items-center gap-1.5 px-3 py-2 text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
