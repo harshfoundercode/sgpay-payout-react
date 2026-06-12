@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Navigate } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import { Navigate,useNavigate } from "react-router-dom";
 
 
 // ── Sample Data ──────────────────────────────────────────────────────────────
@@ -55,7 +54,7 @@ function StatCard({ icon, iconBg, label, value, sub, subColor }) {
 }
 
 // ── Main Component ────────────────────────────────────────────────────────────
-export default function MerchantListPage({ onViewDetails }) {
+export default function MerchantListPage() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("All Status");
   const [page, setPage] = useState(1);
@@ -90,7 +89,7 @@ export default function MerchantListPage({ onViewDetails }) {
             Export
           </button>
           <button
-            onClick={() => navigate("/merchants/new")}
+            onClick={() => navigate("/create-merchant")}
             className="flex items-center gap-2 px-4 py-2 text-xs font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors shadow-sm"
           >
             <svg
@@ -201,7 +200,7 @@ export default function MerchantListPage({ onViewDetails }) {
                 <tr key={m.id} className="border-b border-gray-50 hover:bg-blue-50/30 transition-colors">
                   <td className="px-4 py-3">
                     <button
-                      onClick={() => onViewDetails?.(m)}
+                      onClick={() => navigate(`/merchants/${m.id}`)}
                       className="font-semibold text-gray-600 hover:underline whitespace-nowrap text-xs"
                     >
                       {m.id}
