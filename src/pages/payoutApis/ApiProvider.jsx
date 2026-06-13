@@ -1,6 +1,6 @@
 // import { useState } from "react";
 // import {
-//   Plus, Search, SlidersHorizontal, Download, RefreshCw,
+//   Plus, Search, Download, RefreshCw,
 //   MoreVertical, Eye, Edit2, CheckCircle, XCircle,
 //   Wrench, ArrowUpDown, Database, Scale, FlaskConical,
 //   FileText, Trash2, ChevronLeft, ChevronRight,
@@ -268,24 +268,33 @@
 
 // function ActionMenu({ api, onViewDetail, onClose }) {
 //   const items = [
-//     { Icon: Eye,           label: "View Details",    color: "text-gray-700", action: "view" },
-//     { Icon: Edit2,         label: "Edit API",         color: "text-gray-700", action: "edit" },
-//     { Icon: CheckCircle,   label: "Enable API",       color: "text-green-600",action: "enable" },
-//     { Icon: XCircle,       label: "Disable API",      color: "text-orange-500",action:"disable"},
-//     { Icon: Wrench,        label: "Maintenance Mode", color: "text-purple-600",action: "maint" },
-//     { Icon: ArrowUpDown,   label: "Set Priority",     color: "text-gray-700", action: "priority" },
-//     { Icon: Database,      label: "API Balances",     color: "text-gray-700", action: "balances" },
-//     { Icon: Scale,         label: "API Limits",       color: "text-gray-700", action: "limits" },
-//     { Icon: FlaskConical,  label: "Test API",         color: "text-gray-700", action: "test" },
-//     { Icon: FileText,      label: "View Logs",        color: "text-gray-700", action: "logs" },
-//     { Icon: Trash2,        label: "Delete API",       color: "text-red-600",  action: "delete", divider: true },
+//     { Icon: Eye, label: "View Details", color: "text-gray-700", action: "view" },
+//     { Icon: Edit2, label: "Edit API", color: "text-gray-700", action: "edit" },
+//     { Icon: CheckCircle, label: "Enable API", color: "text-green-600", action: "enable" },
+//     { Icon: XCircle, label: "Disable API", color: "text-orange-500", action: "disable" },
+//     { Icon: Wrench, label: "Maintenance Mode", color: "text-purple-600", action: "maint" },
+//     { Icon: ArrowUpDown, label: "Set Priority", color: "text-gray-700", action: "priority" },
+//     { Icon: Database, label: "API Balances", color: "text-gray-700", action: "balances" },
+//     { Icon: Scale, label: "API Limits", color: "text-gray-700", action: "limits" },
+//     { Icon: FlaskConical, label: "Test API", color: "text-gray-700", action: "test" },
+//     { Icon: FileText, label: "View Logs", color: "text-gray-700", action: "logs" },
+//     { Icon: Trash2, label: "Delete API", color: "text-red-600", action: "delete", divider: true },
 //   ];
+  
+//   const handleAction = (action) => {
+//     onClose();
+//     if (action === "view") {
+//       onViewDetail(api.id);
+//     }
+//     // Add other actions as needed
+//   };
+  
 //   return (
 //     <div className="absolute right-0 top-8 w-52 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 py-1.5 overflow-hidden">
 //       {items.map(({ Icon, label, color, action, divider }) => (
 //         <button
 //           key={action}
-//           onClick={() => { onClose(); if (action === "view") onViewDetail(api.id); }}
+//           onClick={() => handleAction(action)}
 //           className={`w-full flex items-center gap-3 px-4 py-2.5 font-semibold text-[13px] hover:bg-gray-50 transition-colors ${color} ${divider ? "border-t border-gray-100 mt-1" : ""}`}
 //         >
 //           <Icon size={14} /> {label}
@@ -298,24 +307,24 @@
 // // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
 
 // export default function ApiProvidersPage({ onViewDetail = () => {} }) {
-//   const [search,       setSearch]       = useState("");
+//   const [search, setSearch] = useState("");
 //   const [statusFilter, setStatusFilter] = useState("All Status");
-//   const [typeFilter,   setTypeFilter]   = useState("All Types");
-//   const [openMenu,     setOpenMenu]     = useState(null);
-//   const [page,         setPage]         = useState(1);
+//   const [typeFilter, setTypeFilter] = useState("All Types");
+//   const [openMenu, setOpenMenu] = useState(null);
+//   const [page, setPage] = useState(1);
 //   const perPage = 10;
 
 //   const counts = {
-//     total:       apiProviders.length,
-//     active:      apiProviders.filter(a => a.status === "Active").length,
-//     inactive:    apiProviders.filter(a => a.status === "Inactive").length,
+//     total: apiProviders.length,
+//     active: apiProviders.filter(a => a.status === "Active").length,
+//     inactive: apiProviders.filter(a => a.status === "Inactive").length,
 //     maintenance: apiProviders.filter(a => a.status === "Maintenance").length,
 //   };
 
 //   const filtered = apiProviders.filter(a => {
 //     const ms = a.name.toLowerCase().includes(search.toLowerCase()) || a.subtitle.toLowerCase().includes(search.toLowerCase());
 //     const mst = statusFilter === "All Status" || a.status === statusFilter;
-//     const mt  = typeFilter   === "All Types"  || a.type   === typeFilter;
+//     const mt = typeFilter === "All Types" || a.type === typeFilter;
 //     return ms && mst && mt;
 //   });
 
@@ -340,8 +349,7 @@
 
 //       {/* ── STAT CARDS ── */}
 //       <div className="grid grid-cols-4 gap-4 mb-6">
-//         {/* Total */}
-//         <div className="bg-[#F9FAFF] rounded-xl border border-[#ECEFF4]  p-4 flex items-start justify-between">
+//         <div className="bg-[#F9FAFF] rounded-xl border border-[#ECEFF4] p-4 flex items-start justify-between">
 //           <div>
 //             <p className="text-xs text-black font-medium">Total APIs</p>
 //             <p className="text-2xl font-bold text-gray-900 mt-1 leading-none">{counts.total}</p>
@@ -351,8 +359,7 @@
 //             <Database size={20} className="text-[#4281D7]" />
 //           </div>
 //         </div>
-//         {/* Active */}
-//         <div className="bg-[#F5FBF7] rounded-xl border border-[#F2F9F7]  p-4 flex items-start justify-between">
+//         <div className="bg-[#F5FBF7] rounded-xl border border-[#F2F9F7] p-4 flex items-start justify-between">
 //           <div>
 //             <p className="text-xs text-green-600 font-semibold">Active APIs</p>
 //             <p className="text-2xl font-bold text-gray-900 mt-1 leading-none">{counts.active}</p>
@@ -362,8 +369,7 @@
 //             <CheckCircle size={20} className="text-[#209C4E]" />
 //           </div>
 //         </div>
-//         {/* Inactive */}
-//         <div className="bg-[#FDFAF5] rounded-xl border border-[#F7F4EE]  p-4 flex items-start justify-between">
+//         <div className="bg-[#FDFAF5] rounded-xl border border-[#F7F4EE] p-4 flex items-start justify-between">
 //           <div>
 //             <p className="text-xs text-orange-500 font-semibold">Inactive APIs</p>
 //             <p className="text-2xl font-bold text-gray-900 mt-1 leading-none">{counts.inactive}</p>
@@ -373,8 +379,7 @@
 //             <PauseCircle size={20} className="text-[#ED902A]" />
 //           </div>
 //         </div>
-//         {/* Maintenance */}
-//         <div className="bg-[#FAF7FE] rounded-xl border border-[#F1EEF5]  p-4 flex items-start justify-between">
+//         <div className="bg-[#FAF7FE] rounded-xl border border-[#F1EEF5] p-4 flex items-start justify-between">
 //           <div>
 //             <p className="text-xs text-purple-600 font-semibold">In Maintenance</p>
 //             <p className="text-2xl font-bold text-gray-900 mt-1 leading-none">{counts.maintenance}</p>
@@ -387,11 +392,10 @@
 //       </div>
 
 //       {/* ── TABLE CARD ── */}
-//       <div className="bg-white rounded-xl border border-gray-100  overflow-hidden">
+//       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
 
 //         {/* Filters bar */}
 //         <div className="flex items-center gap-3 px-4 py-3.5 border-b border-gray-100">
-//           {/* Search */}
 //           <div className="relative">
 //             <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
 //             <input
@@ -401,24 +405,21 @@
 //               className="pl-8 pr-3 py-2 text-xs border border-gray-200 rounded-lg w-52 outline-none focus:ring-2 focus:ring-blue-100 bg-white text-gray-700 placeholder-gray-400"
 //             />
 //           </div>
-//           {/* Status */}
 //           <div className="relative">
 //             <select
 //               value={statusFilter}
 //               onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
 //               className="appearance-none pl-3 pr-8 py-2 text-xs border border-gray-200 rounded-lg text-gray-600 bg-white outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer"
 //             >
-//               {["All Status","Active","Inactive","Maintenance"].map(s => <option key={s}>{s}</option>)}
+//               {["All Status", "Active", "Inactive", "Maintenance"].map(s => <option key={s}>{s}</option>)}
 //             </select>
 //             <ChevronRight size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 rotate-90 text-gray-400 pointer-events-none" />
 //           </div>
           
 //           <div className="flex-1" />
-//           {/* Export */}
 //           <button className="flex items-center gap-1.5 px-3 py-2 text-xs border border-gray-200 rounded-lg text-black bg-white hover:bg-gray-50 transition-colors">
 //             <Download size={13} /> Export
 //           </button>
-//           {/* Refresh */}
 //           <button className="flex items-center gap-1.5 px-3 py-2 text-xs border border-gray-200 rounded-lg text-black bg-white hover:bg-gray-50 transition-colors">
 //             <RefreshCw size={13} /> Refresh
 //           </button>
@@ -430,9 +431,9 @@
 //             <thead>
 //               <tr className="bg-gray-50/80 border-b border-gray-100">
 //                 {[
-//                   "API Name","Type","Status","Priority",
-//                   "Success Rate (30D)","Available Balance",
-//                   "Daily Limit","Daily Usage","Actions",
+//                   "API Name", "Type", "Status", "Priority",
+//                   "Success Rate (30D)", "Available Balance",
+//                   "Daily Limit", "Daily Usage", "Actions",
 //                 ].map(h => (
 //                   <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap first:pl-5">
 //                     {h}
@@ -442,11 +443,7 @@
 //             </thead>
 //             <tbody>
 //               {rows.map(api => (
-//                 <tr
-//                   key={api.id}
-//                   className="border-b border-gray-50 hover:bg-blue-50/30 transition-colors group"
-//                 >
-//                   {/* API Name */}
+//                 <tr key={api.id} className="border-b border-gray-50 hover:bg-blue-50/30 transition-colors group">
 //                   <td className="px-4 py-4 pl-5">
 //                     <div className="flex items-center gap-3">
 //                       <ApiLogo api={api} />
@@ -461,15 +458,10 @@
 //                       </div>
 //                     </div>
 //                   </td>
-//                   {/* Type */}
 //                   <td className="px-4 py-4 text-xs font-medium text-black whitespace-nowrap">{api.type}</td>
-//                   {/* Status */}
 //                   <td className="px-4 py-4"><StatusBadge status={api.status} /></td>
-//                   {/* Priority */}
 //                   <td className="px-4 py-4 text-sm font-bold text-gray-700">{api.priority}</td>
-//                   {/* Success Rate */}
 //                   <td className="px-4 py-4"><SuccessRateCell rate={api.successRate} /></td>
-//                   {/* Available Balance */}
 //                   <td className="px-4 py-4">
 //                     <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-800">
 //                       {api.availableBalance}
@@ -478,7 +470,6 @@
 //                       )}
 //                     </div>
 //                   </td>
-//                   {/* Daily Limit */}
 //                   <td className="px-4 py-4">
 //                     <div className="flex items-center gap-1.5 text-sm font-medium text-black">
 //                       {api.dailyLimit}
@@ -487,9 +478,7 @@
 //                       )}
 //                     </div>
 //                   </td>
-//                   {/* Daily Usage */}
 //                   <td className="px-4 py-4"><UsageCell api={api} /></td>
-//                   {/* Actions */}
 //                   <td className="px-4 py-4 relative">
 //                     <button
 //                       onClick={() => setOpenMenu(openMenu === api.id ? null : api.id)}
@@ -569,7 +558,7 @@
 //     </div>
 //   );
 // }
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Plus, Search, Download, RefreshCw,
   MoreVertical, Eye, Edit2, CheckCircle, XCircle,
@@ -787,7 +776,7 @@ const STATUS_STYLES = {
 function ApiLogo({ api }) {
   return (
     <div
-      className="w-9 h-9 rounded-lg flex items-center justify-center font-extrabold text-xs flex-shrink-0 select-none"
+      className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center font-extrabold text-[10px] sm:text-xs flex-shrink-0 select-none"
       style={{ background: api.logoBg, color: api.logoColor }}
     >
       {api.logoText}
@@ -798,8 +787,8 @@ function ApiLogo({ api }) {
 function StatusBadge({ status }) {
   const s = STATUS_STYLES[status] || STATUS_STYLES.Inactive;
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${s.badge}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+    <span className={`inline-flex items-center gap-1 px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold ${s.badge}`}>
+      <span className={`w-1 h-1 sm:w-1.5 sm:h-1.5 rounded-full ${s.dot}`} />
       {status}
     </span>
   );
@@ -807,12 +796,12 @@ function StatusBadge({ status }) {
 
 function SuccessRateCell({ rate }) {
   if (rate === null || rate === undefined) return <span className="text-sm text-gray-300">—</span>;
-  if (rate === 0) return <span className="text-sm text-gray-400">0.00%</span>;
+  if (rate === 0) return <span className="text-xs sm:text-sm text-gray-400">0.00%</span>;
   const color = rate >= 95 ? "#22c55e" : rate >= 90 ? "#3b82f6" : "#f97316";
   return (
-    <div className="space-y-1">
-      <span className="text-sm font-semibold text-gray-800">{rate.toFixed(2)}%</span>
-      <div className="w-24 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+    <div className="space-y-0.5 sm:space-y-1">
+      <span className="text-[11px] sm:text-sm font-semibold text-gray-800">{rate.toFixed(2)}%</span>
+      <div className="w-16 sm:w-24 h-1 sm:h-1.5 bg-gray-100 rounded-full overflow-hidden">
         <div className="h-full rounded-full" style={{ width: `${rate}%`, background: color }} />
       </div>
     </div>
@@ -822,17 +811,17 @@ function SuccessRateCell({ rate }) {
 function UsageCell({ api }) {
   const pct = api.dailyUsagePct;
   return (
-    <div className="space-y-1">
-      <div className="flex items-center gap-1.5 text-xs font-semibold text-gray-700">
+    <div className="space-y-0.5 sm:space-y-1">
+      <div className="flex items-center gap-1 text-[11px] sm:text-xs font-semibold text-gray-700">
         {api.dailyUsageAmt}
       </div>
-      <div className="w-28 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+      <div className="w-20 sm:w-28 h-1 sm:h-1.5 bg-gray-100 rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all"
           style={{ width: `${Math.min(pct, 100)}%`, background: api.dailyUsageColor }}
         />
       </div>
-      <span className="text-[11px] text-gray-400">{pct.toFixed(2)}%</span>
+      <span className="text-[9px] sm:text-[11px] text-gray-400">{pct.toFixed(2)}%</span>
     </div>
   );
 }
@@ -857,18 +846,17 @@ function ActionMenu({ api, onViewDetail, onClose }) {
     if (action === "view") {
       onViewDetail(api.id);
     }
-    // Add other actions as needed
   };
   
   return (
-    <div className="absolute right-0 top-8 w-52 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 py-1.5 overflow-hidden">
+    <div className="absolute right-0 top-8 w-48 sm:w-52 bg-white border border-gray-200 rounded-xl shadow-2xl z-50 py-1 overflow-hidden">
       {items.map(({ Icon, label, color, action, divider }) => (
         <button
           key={action}
           onClick={() => handleAction(action)}
-          className={`w-full flex items-center gap-3 px-4 py-2.5 font-semibold text-[13px] hover:bg-gray-50 transition-colors ${color} ${divider ? "border-t border-gray-100 mt-1" : ""}`}
+          className={`w-full flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2 sm:py-2.5 font-semibold text-[11px] sm:text-[13px] hover:bg-gray-50 transition-colors ${color} ${divider ? "border-t border-gray-100 mt-1" : ""}`}
         >
-          <Icon size={14} /> {label}
+          <Icon size={12} sm:size={14} /> {label}
         </button>
       ))}
     </div>
@@ -903,61 +891,61 @@ export default function ApiProvidersPage({ onViewDetail = () => {} }) {
   const rows = filtered.slice((page - 1) * perPage, page * perPage);
 
   return (
-    <div className="bg-gray-50 min-h-screen text-sm">
+    <div className="bg-gray-50 min-h-screen text-sm p-3 sm:p-0">
 
       {/* ── PAGE HEADER ── */}
-      <div className="flex items-start justify-between mb-6">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4 sm:mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 tracking-tight">API Providers</h1>
-          <p className="text-sm text-gray-400 mt-1">
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">API Providers</h1>
+          <p className="text-[11px] sm:text-sm text-gray-400 mt-1">
             Manage all payout API integrations, status, limits and configurations.
           </p>
         </div>
-        <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 active:bg-[#1262FD] text-white rounded-lg px-4 py-2.5 text-xs font-semibold shadow-sm transition-colors">
-          <Plus size={15} /> Add New API Provider
+        <button className="flex items-center justify-center gap-1.5 sm:gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 sm:px-4 py-1.5 sm:py-2.5 text-[11px] sm:text-xs font-semibold shadow-sm transition-colors">
+          <Plus size={13} sm:size={15} /> Add New API Provider
         </button>
       </div>
 
       {/* ── STAT CARDS ── */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
-        <div className="bg-[#F9FAFF] rounded-xl border border-[#ECEFF4] p-4 flex items-start justify-between">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4 sm:mb-6">
+        <div className="bg-[#F9FAFF] rounded-xl border border-[#ECEFF4] p-3 sm:p-4 flex items-start justify-between">
           <div>
-            <p className="text-xs text-black font-medium">Total APIs</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1 leading-none">{counts.total}</p>
-            <p className="text-xs text-gray-800 mt-2">All integrated APIs</p>
+            <p className="text-[11px] sm:text-xs text-black font-medium">Total APIs</p>
+            <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1 leading-none">{counts.total}</p>
+            <p className="text-[10px] sm:text-xs text-gray-800 mt-1 sm:mt-2">All integrated APIs</p>
           </div>
-          <div className="w-11 h-11 bg-[#E6F0FE] rounded-full flex items-center justify-center flex-shrink-0">
-            <Database size={20} className="text-[#4281D7]" />
+          <div className="w-9 h-9 sm:w-11 sm:h-11 bg-[#E6F0FE] rounded-full flex items-center justify-center flex-shrink-0">
+            <Database size={16} sm:size={20} className="text-[#4281D7]" />
           </div>
         </div>
-        <div className="bg-[#F5FBF7] rounded-xl border border-[#F2F9F7] p-4 flex items-start justify-between">
+        <div className="bg-[#F5FBF7] rounded-xl border border-[#F2F9F7] p-3 sm:p-4 flex items-start justify-between">
           <div>
-            <p className="text-xs text-green-600 font-semibold">Active APIs</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1 leading-none">{counts.active}</p>
-            <p className="text-xs text-gray-800 mt-2">Currently enabled</p>
+            <p className="text-[11px] sm:text-xs text-green-600 font-semibold">Active APIs</p>
+            <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1 leading-none">{counts.active}</p>
+            <p className="text-[10px] sm:text-xs text-gray-800 mt-1 sm:mt-2">Currently enabled</p>
           </div>
-          <div className="w-11 h-11 bg-[#E8F4EB] rounded-full flex items-center justify-center flex-shrink-0">
-            <CheckCircle size={20} className="text-[#209C4E]" />
+          <div className="w-9 h-9 sm:w-11 sm:h-11 bg-[#E8F4EB] rounded-full flex items-center justify-center flex-shrink-0">
+            <CheckCircle size={16} sm:size={20} className="text-[#209C4E]" />
           </div>
         </div>
-        <div className="bg-[#FDFAF5] rounded-xl border border-[#F7F4EE] p-4 flex items-start justify-between">
+        <div className="bg-[#FDFAF5] rounded-xl border border-[#F7F4EE] p-3 sm:p-4 flex items-start justify-between">
           <div>
-            <p className="text-xs text-orange-500 font-semibold">Inactive APIs</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1 leading-none">{counts.inactive}</p>
-            <p className="text-xs text-gray-800 mt-2">Currently disabled</p>
+            <p className="text-[11px] sm:text-xs text-orange-500 font-semibold">Inactive APIs</p>
+            <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1 leading-none">{counts.inactive}</p>
+            <p className="text-[10px] sm:text-xs text-gray-800 mt-1 sm:mt-2">Currently disabled</p>
           </div>
-          <div className="w-11 h-11 bg-[#FDF0E0] rounded-full flex items-center justify-center flex-shrink-0">
-            <PauseCircle size={20} className="text-[#ED902A]" />
+          <div className="w-9 h-9 sm:w-11 sm:h-11 bg-[#FDF0E0] rounded-full flex items-center justify-center flex-shrink-0">
+            <PauseCircle size={16} sm:size={20} className="text-[#ED902A]" />
           </div>
         </div>
-        <div className="bg-[#FAF7FE] rounded-xl border border-[#F1EEF5] p-4 flex items-start justify-between">
+        <div className="bg-[#FAF7FE] rounded-xl border border-[#F1EEF5] p-3 sm:p-4 flex items-start justify-between">
           <div>
-            <p className="text-xs text-purple-600 font-semibold">In Maintenance</p>
-            <p className="text-2xl font-bold text-gray-900 mt-1 leading-none">{counts.maintenance}</p>
-            <p className="text-xs text-gray-800 mt-2">Under maintenance</p>
+            <p className="text-[11px] sm:text-xs text-purple-600 font-semibold">In Maintenance</p>
+            <p className="text-lg sm:text-2xl font-bold text-gray-900 mt-1 leading-none">{counts.maintenance}</p>
+            <p className="text-[10px] sm:text-xs text-gray-800 mt-1 sm:mt-2">Under maintenance</p>
           </div>
-          <div className="w-11 h-11 bg-[#EFE9F6] rounded-full flex items-center justify-center flex-shrink-0">
-            <Wrench size={20} className="text-[#8B4FEC]" />
+          <div className="w-9 h-9 sm:w-11 sm:h-11 bg-[#EFE9F6] rounded-full flex items-center justify-center flex-shrink-0">
+            <Wrench size={16} sm:size={20} className="text-[#8B4FEC]" />
           </div>
         </div>
       </div>
@@ -965,40 +953,41 @@ export default function ApiProvidersPage({ onViewDetail = () => {} }) {
       {/* ── TABLE CARD ── */}
       <div className="bg-white rounded-xl border border-gray-100 overflow-hidden">
 
-        {/* Filters bar */}
-        <div className="flex items-center gap-3 px-4 py-3.5 border-b border-gray-100">
-          <div className="relative">
-            <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+        {/* Filters bar - responsive */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 px-3 sm:px-4 py-3 border-b border-gray-100">
+          <div className="relative flex-1 sm:flex-none">
+            <Search size={12} sm:size={13} className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
               value={search}
               onChange={e => { setSearch(e.target.value); setPage(1); }}
               placeholder="Search API by name"
-              className="pl-8 pr-3 py-2 text-xs border border-gray-200 rounded-lg w-52 outline-none focus:ring-2 focus:ring-blue-100 bg-white text-gray-700 placeholder-gray-400"
+              className="w-full pl-7 sm:pl-8 pr-2.5 sm:pr-3 py-1.5 sm:py-2 text-[11px] sm:text-xs border border-gray-200 rounded-lg outline-none focus:ring-2 focus:ring-blue-100 bg-white text-gray-700 placeholder-gray-400"
             />
           </div>
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <select
               value={statusFilter}
               onChange={e => { setStatusFilter(e.target.value); setPage(1); }}
-              className="appearance-none pl-3 pr-8 py-2 text-xs border border-gray-200 rounded-lg text-gray-600 bg-white outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer"
+              className="w-full appearance-none pl-2.5 sm:pl-3 pr-7 sm:pr-8 py-1.5 sm:py-2 text-[11px] sm:text-xs border border-gray-200 rounded-lg text-gray-600 bg-white outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer"
             >
               {["All Status", "Active", "Inactive", "Maintenance"].map(s => <option key={s}>{s}</option>)}
             </select>
-            <ChevronRight size={12} className="absolute right-2.5 top-1/2 -translate-y-1/2 rotate-90 text-gray-400 pointer-events-none" />
+            <ChevronRight size={11} sm:size={12} className="absolute right-2 sm:right-2.5 top-1/2 -translate-y-1/2 rotate-90 text-gray-400 pointer-events-none" />
           </div>
           
-          <div className="flex-1" />
-          <button className="flex items-center gap-1.5 px-3 py-2 text-xs border border-gray-200 rounded-lg text-black bg-white hover:bg-gray-50 transition-colors">
-            <Download size={13} /> Export
-          </button>
-          <button className="flex items-center gap-1.5 px-3 py-2 text-xs border border-gray-200 rounded-lg text-black bg-white hover:bg-gray-50 transition-colors">
-            <RefreshCw size={13} /> Refresh
-          </button>
+          <div className="flex gap-2 sm:flex-1 sm:justify-end">
+            <button className="flex items-center justify-center gap-1 px-2.5 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs border border-gray-200 rounded-lg text-black bg-white hover:bg-gray-50 transition-colors">
+              <Download size={11} sm:size={13} /> Export
+            </button>
+            <button className="flex items-center justify-center gap-1 px-2.5 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs border border-gray-200 rounded-lg text-black bg-white hover:bg-gray-50 transition-colors">
+              <RefreshCw size={11} sm:size={13} /> Refresh
+            </button>
+          </div>
         </div>
 
-        {/* Table */}
+        {/* Table - horizontal scroll on mobile */}
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full min-w-[900px] sm:min-w-full">
             <thead>
               <tr className="bg-gray-50/80 border-b border-gray-100">
                 {[
@@ -1006,7 +995,7 @@ export default function ApiProvidersPage({ onViewDetail = () => {} }) {
                   "Success Rate (30D)", "Available Balance",
                   "Daily Limit", "Daily Usage", "Actions",
                 ].map(h => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold text-gray-500 whitespace-nowrap first:pl-5">
+                  <th key={h} className="px-3 sm:px-4 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-semibold text-gray-500 whitespace-nowrap first:pl-4 sm:first:pl-5">
                     {h}
                   </th>
                 ))}
@@ -1015,47 +1004,47 @@ export default function ApiProvidersPage({ onViewDetail = () => {} }) {
             <tbody>
               {rows.map(api => (
                 <tr key={api.id} className="border-b border-gray-50 hover:bg-blue-50/30 transition-colors group">
-                  <td className="px-4 py-4 pl-5">
-                    <div className="flex items-center gap-3">
+                  <td className="px-3 sm:px-4 py-3 sm:py-4 pl-4 sm:pl-5">
+                    <div className="flex items-center gap-2 sm:gap-3">
                       <ApiLogo api={api} />
-                      <div>
+                      <div className="min-w-0">
                         <button
                           onClick={() => onViewDetail(api.id)}
-                          className="text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors text-left leading-tight"
+                          className="text-[12px] sm:text-sm font-semibold text-gray-900 hover:text-blue-600 transition-colors text-left leading-tight truncate block max-w-[120px] sm:max-w-none"
                         >
                           {api.name}
                         </button>
-                        <p className="text-[11px] text-gray-500 font-medium mt-0.5">{api.subtitle}</p>
+                        <p className="text-[10px] sm:text-[11px] text-gray-500 font-medium mt-0.5 truncate max-w-[120px] sm:max-w-none">{api.subtitle}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-4 text-xs font-medium text-black whitespace-nowrap">{api.type}</td>
-                  <td className="px-4 py-4"><StatusBadge status={api.status} /></td>
-                  <td className="px-4 py-4 text-sm font-bold text-gray-700">{api.priority}</td>
-                  <td className="px-4 py-4"><SuccessRateCell rate={api.successRate} /></td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-1.5 text-sm font-semibold text-gray-800">
+                  <td className="px-3 sm:px-4 py-3 sm:py-4 text-[11px] sm:text-xs font-medium text-black whitespace-nowrap">{api.type}</td>
+                  <td className="px-3 sm:px-4 py-3 sm:py-4"><StatusBadge status={api.status} /></td>
+                  <td className="px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm font-bold text-gray-700">{api.priority}</td>
+                  <td className="px-3 sm:px-4 py-3 sm:py-4"><SuccessRateCell rate={api.successRate} /></td>
+                  <td className="px-3 sm:px-4 py-3 sm:py-4">
+                    <div className="flex items-center gap-1 text-[11px] sm:text-sm font-semibold text-gray-800 whitespace-nowrap">
                       {api.availableBalance}
                       {api.balanceSyncing && (
-                        <RefreshCw size={11} className="text-gray-400 animate-spin" />
+                        <RefreshCw size={10} sm:size={11} className="text-gray-400 animate-spin" />
                       )}
                     </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-1.5 text-sm font-medium text-black">
+                   </td>
+                  <td className="px-3 sm:px-4 py-3 sm:py-4">
+                    <div className="flex items-center gap-1 text-[11px] sm:text-sm font-medium text-black whitespace-nowrap">
                       {api.dailyLimit}
                       {api.dailyLimitEditable && (
-                        <Edit2 size={11} className="text-black hover:text-gray-500 cursor-pointer" />
+                        <Edit2 size={10} sm:size={11} className="text-black hover:text-gray-500 cursor-pointer" />
                       )}
                     </div>
-                  </td>
-                  <td className="px-4 py-4"><UsageCell api={api} /></td>
-                  <td className="px-4 py-4 relative">
+                   </td>
+                  <td className="px-3 sm:px-4 py-3 sm:py-4"><UsageCell api={api} /> </td>
+                  <td className="px-3 sm:px-4 py-3 sm:py-4 relative">
                     <button
                       onClick={() => setOpenMenu(openMenu === api.id ? null : api.id)}
-                      className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+                      className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
                     >
-                      <MoreVertical size={15} className="text-gray-500" />
+                      <MoreVertical size={13} sm:size={15} className="text-gray-500" />
                     </button>
                     {openMenu === api.id && (
                       <ActionMenu
@@ -1064,58 +1053,68 @@ export default function ApiProvidersPage({ onViewDetail = () => {} }) {
                         onClose={() => setOpenMenu(null)}
                       />
                     )}
-                  </td>
-                </tr>
+                   </td>
+                 </tr>
               ))}
               {rows.length === 0 && (
                 <tr>
-                  <td colSpan={9} className="text-center py-16 text-gray-400 text-sm">
+                  <td colSpan={9} className="text-center py-12 sm:py-16 text-gray-400 text-xs sm:text-sm">
                     No API providers match your filters.
-                  </td>
+                   </td>
                 </tr>
               )}
             </tbody>
           </table>
         </div>
 
-        {/* Pagination */}
-        <div className="flex items-center justify-between px-5 py-3.5 border-t border-gray-100">
-          <span className="text-xs text-gray-400">
+        {/* Pagination - responsive */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-4 sm:px-5 py-3 border-t border-gray-100">
+          <span className="text-[10px] sm:text-xs text-gray-400 text-center">
             Showing {rows.length === 0 ? 0 : (page - 1) * perPage + 1} to {Math.min(page * perPage, filtered.length)} of {filtered.length} results
           </span>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-2">
             <div className="relative">
-              <select className="appearance-none text-xs border border-gray-200 rounded-lg pl-3 pr-7 py-1.5 text-gray-600 bg-white outline-none cursor-pointer">
+              <select className="appearance-none text-[11px] sm:text-xs border border-gray-200 rounded-lg pl-2.5 sm:pl-3 pr-6 sm:pr-7 py-1 sm:py-1.5 text-gray-600 bg-white outline-none cursor-pointer">
                 <option>10 per page</option>
                 <option>25 per page</option>
                 <option>50 per page</option>
               </select>
-              <ChevronRight size={11} className="absolute right-2 top-1/2 -translate-y-1/2 rotate-90 text-gray-400 pointer-events-none" />
+              <ChevronRight size={10} sm:size={11} className="absolute right-1.5 sm:right-2 top-1/2 -translate-y-1/2 rotate-90 text-gray-400 pointer-events-none" />
             </div>
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
-                className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-lg text-gray-400 hover:bg-gray-50 disabled:opacity-40 transition-colors"
+                className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center border border-gray-200 rounded-lg text-gray-400 hover:bg-gray-50 disabled:opacity-40 transition-colors"
               >
-                <ChevronLeft size={14} />
+                <ChevronLeft size={12} sm:size={14} />
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+              {Array.from({ length: Math.min(totalPages, 5) }, (_, i) => i + 1).map(p => (
                 <button
                   key={p}
                   onClick={() => setPage(p)}
-                  className={`w-8 h-8 flex items-center justify-center rounded-lg text-xs font-semibold transition-colors
+                  className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-[11px] sm:text-xs font-semibold transition-colors
                     ${page === p ? "bg-blue-600 text-white shadow-sm" : "border border-gray-200 text-gray-600 hover:bg-gray-50"}`}
                 >
                   {p}
                 </button>
               ))}
+              {totalPages > 5 && <span className="text-gray-400 text-[11px] sm:text-xs px-1">...</span>}
+              {totalPages > 5 && (
+                <button
+                  onClick={() => setPage(totalPages)}
+                  className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-[11px] sm:text-xs font-semibold transition-colors
+                    ${page === totalPages ? "bg-blue-600 text-white shadow-sm" : "border border-gray-200 text-gray-600 hover:bg-gray-50"}`}
+                >
+                  {totalPages}
+                </button>
+              )}
               <button
                 onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={page === totalPages}
-                className="w-8 h-8 flex items-center justify-center border border-gray-200 rounded-lg text-gray-400 hover:bg-gray-50 disabled:opacity-40 transition-colors"
+                disabled={page === totalPages || totalPages === 0}
+                className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center border border-gray-200 rounded-lg text-gray-400 hover:bg-gray-50 disabled:opacity-40 transition-colors"
               >
-                <ChevronRight size={14} />
+                <ChevronRight size={12} sm:size={14} />
               </button>
             </div>
           </div>

@@ -83,6 +83,7 @@ import SettlementReport from '../pages/reports/SettlementReports';
 import SuccessFailureReport from '../pages/reports/SuccessFailureReports';
 import ApiProviderDetail from '../pages/payoutApis/ApiProviderDetails';
 import ChangePassword from '../pages/ChangePassword';
+import MerchantDetailsPage from '../pages/merchant/merchantDetails';
 
 const ProtectedRoute = ({ children }) => {
     const token = localStorage.getItem('token');
@@ -133,6 +134,7 @@ export const AppRoutes = () => {
                 <Route path="/transactions" element={<TransactionScreen />} />
                 <Route path="/create-merchant" element={<CreateMerchantPage />} />
                 <Route path="/all-merchant" element={<MerchantListPage />} />
+                <Route path="merchants/:id" element={<MerchantDetailsPage />} />
                 <Route path="/payout-apis" element={<ApiProvidersPageWrapper />} />
                 <Route path="/api-provider-details/:id" element={<ApiProviderDetailWrapper />} />
                 <Route path="/routing" element={<PayoutRouting />} />
