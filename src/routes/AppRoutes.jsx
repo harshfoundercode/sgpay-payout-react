@@ -1,68 +1,3 @@
-// import React from 'react';
-// import { Routes, Route, Navigate } from 'react-router-dom';
-// import BridgeAdminDashboard from '../components/DashboardLayout';
-// import BridgeLogin from '../pages/auth/LoginScreen';
-// import ForgotPassword from '../pages/auth/ForgetPassword';
-
-// import DashboardPage from '../pages/Dashboard';
-// import TransactionScreen from '../pages/TransactionSceen';
-// import MerchantListPage from '../pages/merchant/merchantList';
-// import CreateMerchantPage from '../pages/merchant/AddMerchant';
-// import ApiProvidersPage from '../pages/payoutApis/ApiProvider';
-// import PayoutRouting from '../pages/Routing';
-// import AutoPayout from '../pages/AutoPayout';
-// import ReportsOverview from '../pages/reports/TransactionReports';
-// import MerchantReport from '../pages/reports/MerchantReports';
-// import PayoutReport from '../pages/reports/PayoutReports';
-// import SettlementReport from '../pages/reports/SettlementReports';
-// import SuccessFailureReport from '../pages/reports/SuccessFailureReports';
-// import ApiProviderDetail from '../pages/payoutApis/ApiProviderDetails';
-
-// const ProtectedRoute = ({ children }) => {
-//     const token = localStorage.getItem('token');
-//     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-//     if (!token && !isLoggedIn) return <Navigate to="/login" replace />;
-//     return children;
-// };
-
-// const PublicRoute = ({ children }) => {
-//     const token = localStorage.getItem('token');
-//     const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-//     if (token || isLoggedIn) return <Navigate to="/dashboard" replace />;
-//     return children;
-// };
-
-// export const AppRoutes = () => {
-//     return (
-//         <Routes>
-//             <Route path="/" element={<Navigate to="/login" replace />} />
-//             <Route path="/login" element={<PublicRoute><BridgeLogin /></PublicRoute>} />
-//             <Route path="/forgot-password" element={<ForgotPassword />} />
-
-//             {/* Dashboard layout wrapper — koi path nahi, sirf Outlet */}
-//             <Route element={<ProtectedRoute><BridgeAdminDashboard /></ProtectedRoute>}>
-//                 <Route path="/dashboard" element={<DashboardPage />} />
-//                 <Route path="/transactions" element={<TransactionScreen />} />
-//                 <Route path="/create-merchant" element={<CreateMerchantPage />} />
-//                 <Route path="/all-merchant" element={<MerchantListPage />} />
-//                 <Route path="/payout-apis" element={<ApiProvidersPage />} />
-//                 <Route path="/routing" element={<PayoutRouting />} />
-//                 <Route path="/auto-payout" element={<AutoPayout />} />
-//                 <Route path="/transaction-report" element={<ReportsOverview />} />
-//                 <Route path="/merchant-report" element={<MerchantReport />} />
-//                 <Route path="/payout-report" element={<PayoutReport />} />
-//                 <Route path="/settlement-report" element={<SettlementReport />} />
-//                 <Route path="/success-failure" element={<SuccessFailureReport />} />
-//                 <Route
-//                     path="/api-providers"
-//                     element={<ApiProvidersPage onViewDetail={(id) => navigate(`/api-provider-details/${id}`)} />}
-//                 />
-//             </Route>
-
-//             <Route path="*" element={<Navigate to="/login" replace />} />
-//         </Routes>
-//     );
-// };
 import React from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import BridgeAdminDashboard from '../components/DashboardLayout';
@@ -84,44 +19,37 @@ import SuccessFailureReport from '../pages/reports/SuccessFailureReports';
 import ApiProviderDetail from '../pages/payoutApis/ApiProviderDetails';
 import ChangePassword from '../pages/ChangePassword';
 import MerchantDetailsPage from '../pages/merchant/merchantDetails';
+import authService from '../services/AuthServices';
+
 
 const ProtectedRoute = ({ children }) => {
-    const token = localStorage.getItem('token');
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    if (!token && !isLoggedIn) return <Navigate to="/login" replace />;
+    if (!authService.isAuthenticated()) {
+        return <Navigate to="/login" replace />;
+    }
     return children;
 };
 
+// Public Route Component (redirects if logged in)
 const PublicRoute = ({ children }) => {
-    const token = localStorage.getItem('token');
-    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-    if (token || isLoggedIn) return <Navigate to="/dashboard" replace />;
+    if (authService.isAuthenticated()) {
+        return <Navigate to="/dashboard" replace />;
+    }
     return children;
 };
 
 // Wrapper for ApiProvidersPage to provide navigation
 const ApiProvidersPageWrapper = () => {
     const navigate = useNavigate();
-    
-    const handleViewDetail = (id) => {
-        navigate(`/api-provider-details/${id}`);
-    };
-    
-    return <ApiProvidersPage onViewDetail={handleViewDetail} />;
+    return <ApiProvidersPage onViewDetail={(id) => navigate(`/api-provider-details/${id}`)} />;
 };
 
 // Wrapper for ApiProviderDetail to handle back navigation
 const ApiProviderDetailWrapper = () => {
     const navigate = useNavigate();
-    
-    const handleBack = () => {
-        navigate('/payout-apis');
-    };
-    
-    return <ApiProviderDetail onBack={handleBack} />;
+    return <ApiProviderDetail onBack={() => navigate('/payout-apis')} />;
 };
 
-export const AppRoutes = () => {
+export const AppRoutes = () => { 
     return (
         <Routes>
             <Route path="/" element={<Navigate to="/login" replace />} />

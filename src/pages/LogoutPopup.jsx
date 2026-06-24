@@ -222,22 +222,9 @@ const LogoutScreen = () => {
 
   useEffect(() => {
     // Clear all auth data
-    const performLogout = async () => {
-      // Simulate logout API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Clear all localStorage items
-      localStorage.removeItem('token');
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('userEmail');
-      localStorage.removeItem('bridge_admin_email');
-      localStorage.removeItem('bridge_admin_remember');
-      
-      // Clear sessionStorage if used
-      sessionStorage.clear();
-      
-      setIsLoggingOut(false);
-      setShowSuccess(true);
+     const performLogout = () => {
+        authService.logout();
+        navigate('/login');
     };
 
     performLogout();
