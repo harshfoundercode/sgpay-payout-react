@@ -38,6 +38,10 @@ const API_ENDPOINTS = {
     retry: 'transactions/retry',
     return: 'transactions/return',
   },
+
+  reports:{
+    payout:'payout-report',
+  }
       
 };
 
