@@ -4,7 +4,7 @@ import api from './api';
 const payoutSettingsService = {
   /**
    * Get current payout status
-   * @returns {Promise} - API response { status: "active" | "stopped" }
+   * @returns {Promise} - API response { id, key_name, value, updated_at }
    */
   async getPayoutStatus() {
     try {
@@ -43,6 +43,15 @@ const payoutSettingsService = {
   async togglePayoutStatus(currentStatus) {
     const newStatus = currentStatus === 'active' ? 'stopped' : 'active';
     return this.updatePayoutStatus(newStatus);
+  },
+
+  /**
+   * Get status value from response
+   * @param {Object} response - API response { id, key_name, value, updated_at }
+   * @returns {string} - "active" or "stopped"
+   */
+  getStatusValue(response) {
+    return response?.value || 'active';
   }
 };
 
