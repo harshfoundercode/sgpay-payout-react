@@ -194,7 +194,7 @@ export default function BridgeAdminDashboard() {
                                     ${active ? "bg-blue-50 text-blue-600" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"}`}
                             >
                                 <div className={`flex items-center ${(!showLabel) ? "" : "gap-3"}`}>
-                                    <item.Icon size={16} className="flex-shrink-0" />
+                                    <item.Icon size={16} className="shrink-0" />
                                     {showLabel && <span className="text-[12px] sm:text-[13px] font-medium">{item.label}</span>}
                                 </div>
                                 {showLabel && item.hasChevron && (
@@ -366,17 +366,13 @@ export default function BridgeAdminDashboard() {
                         <Search size={13} sm:size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                         <input
                             className="w-full pl-8 sm:pl-9 pr-12 sm:pr-16 py-1.5 sm:py-2 bg-gray-100 rounded-lg text-[11px] sm:text-xs text-gray-600 placeholder-gray-400 outline-none focus:ring-2 focus:ring-blue-100"
-                            placeholder="Search by API name / Merchant / Transaction ID"
+                            placeholder="Search by Merchant / Transaction ID"
                         />
                         <kbd className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-[9px] sm:text-[10px] text-gray-300 border border-gray-200 rounded px-1 hidden sm:block">⌘ K</kbd>
                     </div>
 
                     <div className="ml-auto flex items-center gap-2 sm:gap-4">
-                        {/* Bell Icon */}
-                        <div className="relative cursor-pointer">
-                            <Bell size={18} sm:size={20} className="text-gray-400" />
-                            <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[8px] sm:text-[9px] font-bold w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full flex items-center justify-center">16</span>
-                        </div>
+                        
 
                         {/* Payout Status Indicator */}
                         {!loadingStatus && (
@@ -398,7 +394,7 @@ export default function BridgeAdminDashboard() {
                                 className="flex items-center gap-1.5 sm:gap-2 cursor-pointer"
                                 onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                             >
-                                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-[10px] sm:text-xs font-bold">SA</div>
+                                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-linear-to-br from-blue-400 to-blue-600 flex items-center justify-center text-white text-[10px] sm:text-xs font-bold">SA</div>
                                 <div className="hidden sm:block">
                                     <p className="text-[11px] sm:text-xs font-semibold text-gray-800">Super Admin</p>
                                     <p className="text-[9px] sm:text-[10px] text-gray-400">Administrator</p>

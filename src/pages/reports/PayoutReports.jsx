@@ -1,398 +1,3 @@
-
-// import { useState } from "react";
-// import {
-//   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
-//   PieChart, Pie, Cell,
-// } from "recharts";
-// import {
-//   Send, IndianRupee, CheckCircle, XCircle, Clock, TrendingUp,
-//   ArrowLeftRight, Users, Receipt, RefreshCw, Timer,
-//   Calendar, ChevronDown, Download, ArrowRight, MoreVertical, Info,
-// } from "lucide-react";
-// import DateRangePicker from "../../components/DatePicker";
-
-
-// // ─── DATA ─────────────────────────────────────────────────────────────────────
-
-// const topStatCards = [
-//   { label: "Total Payouts", value: "25,842", change: "↗ 12.5%", up: true, sub: "vs last 30 days", Icon: Send, iconBg: "bg-purple-100", iconColor: "text-purple-600" },
-//   { label: "Total Payout Amount", value: "₹12.54 Cr", change: "↗ 15.4%", up: true, sub: "vs last 30 days", Icon: IndianRupee, iconBg: "bg-blue-100", iconColor: "text-blue-600" },
-//   { label: "Successful Payouts", value: "25,430", change: "↗ 13.2%", up: true, sub: "vs last 30 days", Icon: CheckCircle, iconBg: "bg-green-100", iconColor: "text-green-600" },
-//   { label: "Failed Payouts", value: "412", change: "↘ 8.7%", up: false, sub: "vs last 30 days", Icon: XCircle, iconBg: "bg-red-100", iconColor: "text-red-500" },
-//   { label: "Pending Payouts", value: "56", change: "↘ 3.1%", up: false, sub: "vs last 30 days", Icon: Clock, iconBg: "bg-orange-100", iconColor: "text-orange-500" },
-//   { label: "Success Rate", value: "98.42%", change: "↗ 0.68%", up: true, sub: "vs last 30 days", Icon: TrendingUp, iconBg: "bg-emerald-100", iconColor: "text-emerald-600" },
-// ];
-
-// const bottomStatCards = [
-//   { label: "Average Payout Amount", value: "₹4,853.32", change: "↗ 4.2%", up: true, sub: "vs last 30 days", Icon: ArrowLeftRight, iconBg: "bg-purple-100", iconColor: "text-purple-600" },
-//   { label: "Total Unique Beneficiaries", value: "18,732", change: "↗ 8.1%", up: true, sub: "vs last 30 days", Icon: Users, iconBg: "bg-blue-100", iconColor: "text-blue-600" },
-//   { label: "Total Charges", value: "₹18.90 L", change: "↗ 6.3%", up: true, sub: "vs last 30 days", Icon: Receipt, iconBg: "bg-green-100", iconColor: "text-green-600" },
-//   { label: "Returned Amount", value: "₹6.45 L", change: "↘ 5.6%", up: false, sub: "vs last 30 days", Icon: RefreshCw, iconBg: "bg-orange-100", iconColor: "text-orange-500" },
-//   { label: "Processing Time (Avg)", value: "8.42 sec", change: "↘ 1.2 sec", up: false, sub: "vs last 30 days", Icon: Timer, iconBg: "bg-yellow-100", iconColor: "text-yellow-600" },
-//   { label: "Payout Success Amount", value: "₹12.35 Cr", change: "↗ 15.6%", up: true, sub: "vs last 30 days", Icon: IndianRupee, iconBg: "bg-emerald-100", iconColor: "text-emerald-600" },
-// ];
-
-// const trendData = [
-//   { date: "8 May", vol: 2.2 },
-//   { date: "9 May", vol: 3.8 },
-//   { date: "10 May", vol: 5.0 },
-//   { date: "11 May", vol: 7.8 },
-//   { date: "12 May", vol: 8.2 },
-//   { date: "13 May", vol: 7.5 },
-//   { date: "14 May", vol: 2.5 },
-// ];
-
-// const statusDonut = [
-//   { name: "Successful", value: 25430, pct: "98.42%", color: "#16a34a" },
-//   { name: "Failed", value: 412, pct: "1.58%", color: "#ef4444" },
-//   { name: "Pending", value: 56, pct: "0.22%", color: "#f59e0b" },
-//   { name: "Returned", value: 32, pct: "0.12%", color: "#9ca3af" },
-// ];
-
-// const apiDonut = [
-//   { name: "RazorpayX", value: 10425, pct: "40.32%", color: "#2563eb" },
-//   { name: "Cashfree", value: 6842, pct: "26.46%", color: "#16a34a" },
-//   { name: "Paytm Payouts", value: 4125, pct: "15.94%", color: "#8b5cf6" },
-//   { name: "PhonePe Payout", value: 2856, pct: "11.04%", color: "#f59e0b" },
-//   { name: "Amazon Pay", value: 1594, pct: "6.16%", color: "#06b6d4" },
-// ];
-
-// const merchantTable = [
-//   { name: "ABC Pvt Ltd", payouts: "5,230", amount: "₹2.35 Cr", rate: "98.72%" },
-//   { name: "XYZ Retailers", payouts: "4,120", amount: "₹1.85 Cr", rate: "97.91%" },
-//   { name: "Global Solutions", payouts: "3,250", amount: "₹1.25 Cr", rate: "98.12%" },
-//   { name: "Quick Pay Services", payouts: "2,850", amount: "₹1.05 Cr", rate: "97.80%" },
-//   { name: "Prime Business", payouts: "2,150", amount: "₹85.40 L", rate: "97.45%" },
-// ];
-
-// const failReasons = [
-//   { name: "Invalid Account", pct: 32.0, count: 132, color: "#ef4444" },
-//   { name: "Insufficient Balance", pct: 21.6, count: 89, color: "#f59e0b" },
-//   { name: "Account Closed", pct: 18.4, count: 76, color: "#f97316" },
-//   { name: "Bank Error", pct: 15.5, count: 64, color: "#2563eb" },
-//   { name: "Other Reasons", pct: 12.5, count: 51, color: "#9ca3af" },
-// ];
-
-// const distribution = [
-//   { range: "₹0 – ₹1,000", pct: 35.20, barW: 88 },
-//   { range: "₹1,001 – ₹10,000", pct: 32.40, barW: 81 },
-//   { range: "₹10,001 – ₹50,000", pct: 18.60, barW: 46.5 },
-//   { range: "₹50,001 – ₹1,00,000", pct: 8.90, barW: 22.25 },
-//   { range: "Above ₹1,00,000", pct: 4.90, barW: 12.25 },
-// ];
-
-// // ─── HELPERS ──────────────────────────────────────────────────────────────────
-
-// function Card({ children, className = "" }) {
-//   return (
-//     <div className={`bg-white rounded-xl border border-gray-100 p-3 sm:p-4 ${className}`}>
-//       {children}
-//     </div>
-//   );
-// }
-
-// function StatCard({ label, value, change, up, sub, Icon, iconBg, iconColor }) {
-//   return (
-//     <div className="bg-white rounded-xl border border-gray-100 p-2.5 sm:p-3.5 flex items-start gap-2 sm:gap-3">
-//       <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 ${iconBg}`}>
-//         <Icon size={14} sm:size={17} className={iconColor} />
-//       </div>
-//       <div className="min-w-0 flex-1">
-//         <p className="text-[9px] sm:text-[10px] text-gray-800 font-medium leading-tight truncate">{label}</p>
-//         <p className="text-[14px] sm:text-[17px] font-bold text-gray-900 mt-0.5 leading-tight truncate">{value}</p>
-//         <p className={`text-[9px] sm:text-[10px] mt-0.5 sm:mt-1 font-medium ${up ? "text-green-600" : "text-red-500"}`}>
-//           {change}
-//           <span className="text-gray-400 font-normal block text-[8px] sm:text-[9px]">{sub}</span>
-//         </p>
-//       </div>
-//     </div>
-//   );
-// }
-
-// function DonutCenter({ cx, cy, line1, line2 }) {
-//   return (
-//     <g>
-//       <text x={cx} y={cy - 6} textAnchor="middle" fontSize={11} fontWeight={600} fill="#111827">{line1}</text>
-//       <text x={cx} y={cy + 10} textAnchor="middle" fontSize={8} fill="#9ca3af">{line2}</text>
-//     </g>
-//   );
-// }
-
-// function LegendRow({ color, name, right }) {
-//   return (
-//     <div className="flex items-center justify-between mb-1.5 text-[10px] sm:text-[11px]">
-//       <div className="flex items-center gap-1 sm:gap-1.5">
-//         <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full shrink-0" style={{ background: color }} />
-//         <span className="text-gray-800 font-medium truncate max-w-[80px] sm:max-w-none">{name}</span>
-//       </div>
-//       <span className="text-gray-400 ml-1 sm:ml-2 font-medium whitespace-nowrap text-[9px] sm:text-[11px]">{right}</span>
-//     </div>
-//   );
-// }
-
-// // ─── MAIN ─────────────────────────────────────────────────────────────────────
-
-// export default function PayoutReport() {
-//   const [activePeriod, setActivePeriod] = useState("7D");
-//   const [dateRange, setDateRange] = useState(null);
-
-//   const handleDateChange = (dateData) => {
-//     if (dateData) {
-//       setDateRange(dateData);
-//       console.log('Date Range Selected:', dateData);
-//     } else {
-//       console.log('Date range cleared');
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen text-sm p-3 sm:p-0">
-
-//       {/* ── PAGE HEADER ── */}
-//       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-4 sm:mb-5">
-//         <div>
-//           <h1 className="text-lg sm:text-2xl font-bold text-gray-900">Payout Report</h1>
-//           <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5 sm:mt-1">Reports › Payout Report</p>
-//         </div>
-//         <div className="flex flex-wrap items-center gap-2">
-//           <DateRangePicker
-//             onDateChange={handleDateChange}
-//             placeholder="14 May, 2025 - 14 May, 2025"
-//           />
-//           <button className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50">
-//             Merchants <ChevronDown size={10} sm:size={11} />
-//           </button>
-//           <button className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50">
-//             APIs <ChevronDown size={10} sm:size={11} />
-//           </button>
-//           <button className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50">
-//             Status <ChevronDown size={10} sm:size={11} />
-//           </button>
-//           <button className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold transition-colors">
-//             Apply
-//           </button>
-//           <button className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50">
-//             <Download size={11} sm:size={13} /> Export
-//           </button>
-//         </div>
-//       </div>
-
-//       {/* ── TOP 6 STATS ── */}
-//       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 mb-3 sm:mb-4">
-//         {topStatCards.map(c => <StatCard key={c.label} {...c} />)}
-//       </div>
-
-//       {/* ── CHARTS ROW ── */}
-//       <div className="flex flex-col lg:flex-row gap-3 mb-3">
-
-//         {/* Payout Volume Trend */}
-//         <div className="flex-1">
-//           <Card>
-//             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
-//               <p className="text-xs sm:text-sm font-semibold text-gray-800 flex items-center gap-1.5">
-//                 Payout Volume Trend <Info size={12} sm:size={13} className="text-gray-300" />
-//               </p>
-//               <div className="flex items-center gap-1.5">
-//                 {["7D", "30D", "90D"].map(p => (
-//                   <button
-//                     key={p}
-//                     onClick={() => setActivePeriod(p)}
-//                     className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-xs font-semibold transition-colors
-//                       ${activePeriod === p ? "bg-blue-600 text-white" : "border border-gray-200 text-gray-500 hover:bg-gray-50"}`}
-//                   >
-//                     {p}
-//                   </button>
-//                 ))}
-//               </div>
-//             </div>
-//             <div className="h-[180px] sm:h-[195px] w-full">
-//               <ResponsiveContainer width="100%" height="100%">
-//                 <AreaChart data={trendData} margin={{ top: 5, right: 5, left: -20, bottom: 0 }}>
-//                   <defs>
-//                     <linearGradient id="tvGrad" x1="0" y1="0" x2="0" y2="1">
-//                       <stop offset="5%" stopColor="#2563eb" stopOpacity={0.12} />
-//                       <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
-//                     </linearGradient>
-//                   </defs>
-//                   <XAxis dataKey="date" tick={{ fontSize: 9, fill: "#9ca3af" }} axisLine={false} tickLine={false} />
-//                   <YAxis tick={{ fontSize: 9, fill: "#9ca3af" }} axisLine={false} tickLine={false} tickFormatter={v => `${v}M`} width={30} />
-//                   <Tooltip formatter={v => [`₹${v}M`, "Volume"]} contentStyle={{ fontSize: 10, borderRadius: 8, border: "1px solid #e5e7eb" }} />
-//                   <Area type="monotone" dataKey="vol" stroke="#2563eb" strokeWidth={2} fill="url(#tvGrad)" dot={{ r: 3, fill: "#2563eb" }} activeDot={{ r: 4 }} />
-//                 </AreaChart>
-//               </ResponsiveContainer>
-//             </div>
-//           </Card>
-//         </div>
-
-//         {/* Payouts by Status */}
-//         <div className="flex-1">
-//           <Card>
-//             <div className="flex items-center justify-between mb-2 sm:mb-3">
-//               <p className="text-xs sm:text-sm font-semibold text-gray-800">Payouts by Status</p>
-//               <MoreVertical size={13} sm:size={15} className="text-gray-400 cursor-pointer" />
-//             </div>
-//             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
-//               <div className="flex-shrink-0">
-//                 <div className="h-[110px] w-[110px] sm:h-[120px] sm:w-[120px]">
-//                   <ResponsiveContainer width="100%" height="100%">
-//                     <PieChart>
-//                       <Pie data={statusDonut} cx="50%" cy="50%" innerRadius={35} outerRadius={52} dataKey="value" strokeWidth={2} stroke="#fff">
-//                         {statusDonut.map((e, i) => <Cell key={i} fill={e.color} />)}
-//                       </Pie>
-//                       <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle">
-//                         <tspan x="50%" dy="-6" fontSize="10" fontWeight="600" fill="#111827">25,842</tspan>
-//                         <tspan x="50%" dy="14" fontSize="8" fill="#9ca3af">Total</tspan>
-//                       </text>
-//                     </PieChart>
-//                   </ResponsiveContainer>
-//                 </div>
-//               </div>
-//               <div className="flex-1 w-full">
-//                 {statusDonut.map(e => (
-//                   <LegendRow key={e.name} color={e.color} name={e.name} right={`${e.value.toLocaleString()} (${e.pct})`} />
-//                 ))}
-//               </div>
-//             </div>
-//           </Card>
-//         </div>
-
-//         {/* Payouts by API */}
-//         <div className="flex-1">
-//           <Card>
-//             <div className="flex items-center justify-between mb-2 sm:mb-3">
-//               <p className="text-xs sm:text-sm font-semibold text-gray-800">Payouts by API</p>
-//               <MoreVertical size={13} sm:size={15} className="text-gray-400 cursor-pointer" />
-//             </div>
-//             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
-//               <div className="flex-shrink-0">
-//                 <div className="h-[105px] w-[105px] sm:h-[115px] sm:w-[115px]">
-//                   <ResponsiveContainer width="100%" height="100%">
-//                     <PieChart>
-//                       <Pie data={apiDonut} cx="50%" cy="50%" innerRadius={33} outerRadius={50} dataKey="value" strokeWidth={2} stroke="#fff">
-//                         {apiDonut.map((e, i) => <Cell key={i} fill={e.color} />)}
-//                       </Pie>
-//                       <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle">
-//                         <tspan x="50%" dy="-6" fontSize="10" fontWeight="600" fill="#111827">25,842</tspan>
-//                         <tspan x="50%" dy="14" fontSize="8" fill="#9ca3af">Total</tspan>
-//                       </text>
-//                     </PieChart>
-//                   </ResponsiveContainer>
-//                 </div>
-//               </div>
-//               <div className="flex-1 w-full">
-//                 {apiDonut.map(e => (
-//                   <LegendRow key={e.name} color={e.color} name={e.name} right={`${e.value.toLocaleString()} (${e.pct})`} />
-//                 ))}
-//               </div>
-//             </div>
-//           </Card>
-//         </div>
-//       </div>
-
-//       {/* ── SECONDARY 6 STATS ── */}
-//       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 mb-3 sm:mb-4">
-//         {bottomStatCards.map(c => <StatCard key={c.label} {...c} />)}
-//       </div>
-
-//       {/* ── BOTTOM ROW ── */}
-//       <div className="flex flex-col lg:flex-row gap-3">
-
-//         {/* Payouts by Merchant */}
-//         <div className="flex-1">
-//           <Card>
-//             <p className="text-xs sm:text-sm font-semibold text-gray-800 mb-2 sm:mb-3">Payouts by Merchant (Top 5)</p>
-//             <div className="overflow-x-auto">
-//               <table className="w-full min-w-[500px] text-[10px] sm:text-xs">
-//                 <thead>
-//                   <tr className="border-b border-gray-100 text-gray-800">
-//                     <th className="text-left pb-2 font-medium">Merchant</th>
-//                     <th className="text-right pb-2 font-medium">Payouts</th>
-//                     <th className="text-right pb-2 font-medium">Amount</th>
-//                     <th className="text-right pb-2 font-medium">Success Rate</th>
-//                   </tr>
-//                 </thead>
-//                 <tbody>
-//                   {merchantTable.map(({ name, payouts, amount, rate }) => (
-//                     <tr key={name} className="border-b border-gray-50 last:border-0">
-//                       <td className="py-1.5 sm:py-2 text-gray-700 font-medium truncate max-w-[100px] sm:max-w-none">{name}</td>
-//                       <td className="py-1.5 sm:py-2 text-right text-gray-700 font-medium">{payouts}</td>
-//                       <td className="py-1.5 sm:py-2 text-right font-semibold text-gray-900">{amount}</td>
-//                       <td className="py-1.5 sm:py-2 text-right text-gray-700 font-medium">
-//                         <span className="flex items-center justify-end gap-1">
-//                           {rate}
-//                           <span className="inline-block w-5 h-1 bg-green-500 rounded-full" />
-//                         </span>
-//                       </td>
-//                     </tr>
-//                   ))}
-//                 </tbody>
-//               </table>
-//             </div>
-//             <button className="flex items-center gap-1 text-[11px] sm:text-xs text-blue-600 hover:text-blue-800 mt-2 sm:mt-3 font-medium">
-//               View All Merchants <ArrowRight size={11} sm:size={13} />
-//             </button>
-//           </Card>
-//         </div>
-
-//         {/* Payouts by Reason (Failed) */}
-//         <div className="flex-1">
-//           <Card>
-//             <p className="text-xs sm:text-sm font-semibold text-gray-800 mb-3 sm:mb-4">Payouts by Reason (Failed)</p>
-//             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
-//               <div className="shrink-0">
-//                 <div className="h-[100px] w-[100px] sm:h-[110px] sm:w-[110px]">
-//                   <ResponsiveContainer width="100%" height="100%">
-//                     <PieChart>
-//                       <Pie data={failReasons} cx="50%" cy="50%" innerRadius={30} outerRadius={48} dataKey="count" strokeWidth={2} stroke="#fff">
-//                         {failReasons.map((e, i) => <Cell key={i} fill={e.color} />)}
-//                       </Pie>
-//                       <text x="50%" y="50%" textAnchor="middle" dominantBaseline="middle">
-//                         <tspan x="50%" dy="-6" fontSize="10" fontWeight="600" fill="#111827">412</tspan>
-//                         <tspan x="50%" dy="14" fontSize="8" fill="#9ca3af">Total</tspan>
-//                       </text>
-//                     </PieChart>
-//                   </ResponsiveContainer>
-//                 </div>
-//               </div>
-//               <div className="flex-1 w-full">
-//                 {failReasons.map(e => (
-//                   <LegendRow key={e.name} color={e.color} name={e.name} right={`${e.pct}% (${e.count})`} />
-//                 ))}
-//               </div>
-//             </div>
-//             <button className="flex items-center gap-1 text-[11px] sm:text-xs text-blue-600 hover:text-blue-800 mt-2 sm:mt-3 font-medium">
-//               View All Reasons <ArrowRight size={11} sm:size={13} />
-//             </button>
-//           </Card>
-//         </div>
-
-//         {/* Payout Amount Distribution */}
-//         <div className="flex-1">
-//           <Card>
-//             <p className="text-xs sm:text-sm font-semibold text-gray-800 mb-3 sm:mb-4">Payout Amount Distribution</p>
-//             <div className="space-y-3 sm:space-y-4">
-//               {distribution.map(({ range, pct, barW }) => (
-//                 <div key={range} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
-//                   <span className="text-[10px] sm:text-xs text-gray-700 font-medium w-32 sm:w-36 shrink-0">{range}</span>
-//                   <div className="flex-1 flex items-center gap-2">
-//                     <div className="flex-1 h-1.5 sm:h-2 bg-gray-100 rounded-full overflow-hidden">
-//                       <div className="h-full bg-blue-600 rounded-full" style={{ width: `${Math.min(barW, 100)}%` }} />
-//                     </div>
-//                     <span className="text-[10px] sm:text-xs text-gray-500 w-8 sm:w-10 text-right shrink-0 font-medium">{pct}%</span>
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-//             <button className="flex items-center gap-1 text-[11px] sm:text-xs text-blue-600 hover:text-blue-800 mt-3 sm:mt-4 font-medium">
-//               View Distribution Report <ArrowRight size={11} sm:size={13} />
-//             </button>
-//           </Card>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// }
-// src/pages/reports/PayoutReports.jsx
 import { useState, useEffect } from "react";
 import {
   AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -405,6 +10,7 @@ import {
 } from "lucide-react";
 import DateRangePicker from "../../components/DatePicker";
 import payoutReportService from "../../services/PayoutReportServices";
+import merchantService from "../../services/MerchantListServices";
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
@@ -419,7 +25,7 @@ function Card({ children, className = "" }) {
 function StatCard({ label, value, change, up, sub, Icon, iconBg, iconColor }) {
   return (
     <div className="bg-white rounded-xl border border-gray-100 p-2.5 sm:p-3.5 flex items-start gap-2 sm:gap-3">
-      <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center flex-shrink-0 ${iconBg}`}>
+      <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-full flex items-center justify-center shrink-0 ${iconBg}`}>
         <Icon size={14} sm:size={17} className={iconColor} />
       </div>
       <div className="min-w-0 flex-1">
@@ -441,7 +47,7 @@ function LegendRow({ color, name, right }) {
     <div className="flex items-center justify-between mb-1.5 text-[10px] sm:text-[11px]">
       <div className="flex items-center gap-1 sm:gap-1.5">
         <span className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full shrink-0" style={{ background: color }} />
-        <span className="text-gray-800 font-medium truncate max-w-[80px] sm:max-w-none">{name}</span>
+        <span className="text-gray-800 font-medium truncate max-w-20 sm:max-w-none">{name}</span>
       </div>
       <span className="text-gray-400 ml-1 sm:ml-2 font-medium whitespace-nowrap text-[9px] sm:text-[11px]">{right}</span>
     </div>
@@ -455,6 +61,19 @@ export default function PayoutReport() {
   const [dateRange, setDateRange] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  // ─── Filter States ───
+  const [selectedMerchant, setSelectedMerchant] = useState("");
+  const [selectedApi, setSelectedApi] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+  const [merchants, setMerchants] = useState([]);
+  const [loadingMerchants, setLoadingMerchants] = useState(false);
+  
+  // ─── Dropdown Open States ───
+  const [isMerchantOpen, setIsMerchantOpen] = useState(false);
+  const [isApiOpen, setIsApiOpen] = useState(false);
+  const [isStatusOpen, setIsStatusOpen] = useState(false);
+
   const [reportData, setReportData] = useState({
     summary: {
       total_payout_count: 0,
@@ -475,6 +94,35 @@ export default function PayoutReport() {
     amount_distribution: []
   });
 
+  // ─── API Status Options ───
+  const statusOptions = [
+    { value: "", label: "All Status" },
+    { value: "success", label: "Success" },
+    { value: "failed", label: "Failed" },
+    { value: "initiated", label: "Initiated" },
+    { value: "processing", label: "Processing" },
+    { value: "returned", label: "Returned" },
+  ];
+
+  // ─── Fetch Merchants ───
+  const fetchMerchants = async () => {
+    setLoadingMerchants(true);
+    try {
+      const response = await merchantService.getMerchants({ limit: 100 });
+      if (response.data) {
+        setMerchants(response.data);
+      }
+    } catch (err) {
+      console.error('Error fetching merchants:', err);
+    } finally {
+      setLoadingMerchants(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchMerchants();
+  }, []);
+
   // ─── Fetch Report Data ──────────────────────────────────────────────────────
   const fetchReportData = async () => {
     setLoading(true);
@@ -483,9 +131,25 @@ export default function PayoutReport() {
     try {
       const params = {};
       
+      // Date range
       if (dateRange) {
-        params.start_date = dateRange.startFormatted;
-        params.end_date = dateRange.endFormatted;
+        params.from_date = dateRange.startFormatted;
+        params.to_date = dateRange.endFormatted;
+      }
+      
+      // Merchant filter
+      if (selectedMerchant) {
+        params.merchant_id = selectedMerchant;
+      }
+      
+      // API filter
+      if (selectedApi) {
+        params.api_used = selectedApi;
+      }
+      
+      // Status filter
+      if (selectedStatus) {
+        params.status = selectedStatus;
       }
       
       const response = await payoutReportService.getPayoutReport(params);
@@ -498,9 +162,10 @@ export default function PayoutReport() {
     }
   };
 
+  // Fetch when filters change
   useEffect(() => {
     fetchReportData();
-  }, [dateRange]);
+  }, [dateRange, selectedMerchant, selectedApi, selectedStatus]);
 
   const handleDateChange = (dateData) => {
     if (dateData) {
@@ -514,6 +179,29 @@ export default function PayoutReport() {
 
   const handleRefresh = () => {
     fetchReportData();
+  };
+
+  // ─── Filter Handlers ───
+  const handleMerchantSelect = (merchantId) => {
+    setSelectedMerchant(merchantId);
+    setIsMerchantOpen(false);
+  };
+
+  const handleApiSelect = (apiId) => {
+    setSelectedApi(apiId);
+    setIsApiOpen(false);
+  };
+
+  const handleStatusSelect = (status) => {
+    setSelectedStatus(status);
+    setIsStatusOpen(false);
+  };
+
+  const clearFilters = () => {
+    setSelectedMerchant("");
+    setSelectedApi("");
+    setSelectedStatus("");
+    setDateRange(null);
   };
 
   // ─── Format Helpers ─────────────────────────────────────────────────────────
@@ -598,7 +286,7 @@ export default function PayoutReport() {
   const distribution = amountDistribution.map(item => ({
     range: item.range_label || 'Unknown',
     pct: parseFloat(item.percentage || 0),
-    barW: parseFloat(item.percentage || 0) * 2.5 // Scale for visual
+    barW: parseFloat(item.percentage || 0) * 2.5
   }));
 
   // Top stat cards from API
@@ -775,26 +463,145 @@ export default function PayoutReport() {
             onDateChange={handleDateChange}
             placeholder="Select date range"
           />
-          <button className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50">
-            Merchants <ChevronDown size={10} sm:size={11} />
-          </button>
-          <button className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50">
-            APIs <ChevronDown size={10} sm:size={11} />
-          </button>
-          <button className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50">
-            Status <ChevronDown size={10} sm:size={11} />
-          </button>
+          
+          {/* ── Merchant Dropdown ── */}
+          <div className="relative">
+            <button
+              onClick={() => setIsMerchantOpen(!isMerchantOpen)}
+              className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50 min-w-25"
+            >
+              {selectedMerchant ? merchants.find(m => m.merchant_id === selectedMerchant)?.merchant_id || 'Merchant' : 'Merchants'}
+              <ChevronDown size={10} sm:size={11} className={isMerchantOpen ? 'rotate-180' : ''} />
+            </button>
+            {isMerchantOpen && (
+              <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                <div className="p-2">
+                  <button
+                    onClick={() => handleMerchantSelect("")}
+                    className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 rounded"
+                  >
+                    All Merchants
+                  </button>
+                  {loadingMerchants ? (
+                    <div className="text-center py-2 text-gray-400 text-xs">Loading...</div>
+                  ) : (
+                    merchants.map((merchant) => (
+                      <button
+                        key={merchant.id}
+                        onClick={() => handleMerchantSelect(merchant.merchant_id)}
+                        className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 rounded truncate"
+                      >
+                        {merchant.merchant_id}
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── API Dropdown ── */}
+          <div className="relative">
+            <button
+              onClick={() => setIsApiOpen(!isApiOpen)}
+              className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50 min-w-20"
+            >
+              {selectedApi || 'APIs'}
+              <ChevronDown size={10} sm:size={11} className={isApiOpen ? 'rotate-180' : ''} />
+            </button>
+            {isApiOpen && (
+              <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+                <div className="p-2">
+                  <button
+                    onClick={() => handleApiSelect("")}
+                    className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 rounded"
+                  >
+                    All APIs
+                  </button>
+                  {payoutsByApi.map((api) => (
+                    <button
+                      key={api.api_name}
+                      onClick={() => handleApiSelect(api.api_name)}
+                      className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 rounded truncate"
+                    >
+                      {api.api_name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* ── Status Dropdown ── */}
+          <div className="relative">
+            <button
+              onClick={() => setIsStatusOpen(!isStatusOpen)}
+              className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50 min-w-20"
+            >
+              {selectedStatus ? getStatusDisplay(selectedStatus) : 'Status'}
+              <ChevronDown size={10} sm:size={11} className={isStatusOpen ? 'rotate-180' : ''} />
+            </button>
+            {isStatusOpen && (
+              <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+                <div className="p-2">
+                  {statusOptions.map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => handleStatusSelect(option.value)}
+                      className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 rounded"
+                    >
+                      {option.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
           <button 
             onClick={handleRefresh}
             className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold transition-colors"
           >
             Apply
           </button>
+          <button 
+            onClick={clearFilters}
+            className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50"
+          >
+            <RefreshCw size={11} sm:size={13} /> Reset
+          </button>
           <button className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50">
             <Download size={11} sm:size={13} /> Export
           </button>
         </div>
       </div>
+
+      {/* ── Active Filters Display ── */}
+      {(selectedMerchant || selectedApi || selectedStatus || dateRange) && (
+        <div className="flex flex-wrap items-center gap-2 mb-3">
+          <span className="text-xs text-gray-500">Active Filters:</span>
+          {dateRange && (
+            <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px]">
+              {dateRange.startFormatted} - {dateRange.endFormatted}
+            </span>
+          )}
+          {selectedMerchant && (
+            <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px]">
+              Merchant: {selectedMerchant}
+            </span>
+          )}
+          {selectedApi && (
+            <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px]">
+              API: {selectedApi}
+            </span>
+          )}
+          {selectedStatus && (
+            <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px]">
+              Status: {getStatusDisplay(selectedStatus)}
+            </span>
+          )}
+        </div>
+      )}
 
       {/* ── TOP 6 STATS ── */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3 mb-3 sm:mb-4">
@@ -804,7 +611,7 @@ export default function PayoutReport() {
       {/* ── CHARTS ROW ── */}
       <div className="flex flex-col lg:flex-row gap-3 mb-3">
 
-        {/* Payout Volume Trend - Using status data */}
+        {/* Payout Volume Trend */}
         <div className="flex-1">
           <Card>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
@@ -824,7 +631,7 @@ export default function PayoutReport() {
                 ))}
               </div>
             </div>
-            <div className="h-[180px] sm:h-[195px] w-full flex items-center justify-center">
+            <div className="h-45 sm:h-48.75 w-full flex items-center justify-center">
               <div className="text-center text-gray-400">
                 <p className="text-sm">Trend data available</p>
                 <p className="text-xs mt-1">Total Payouts: {formatNumber(summary.total_payout_count)}</p>
@@ -841,8 +648,8 @@ export default function PayoutReport() {
               <MoreVertical size={13} sm:size={15} className="text-gray-400 cursor-pointer" />
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
-              <div className="flex-shrink-0">
-                <div className="h-[110px] w-[110px] sm:h-[120px] sm:w-[120px]">
+              <div className="shrink-0">
+                <div className="h-27.5 w-27.5 sm:h-30 sm:w-30">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie data={statusDonut} cx="50%" cy="50%" innerRadius={35} outerRadius={52} dataKey="value" strokeWidth={2} stroke="#fff">
@@ -873,8 +680,8 @@ export default function PayoutReport() {
               <MoreVertical size={13} sm:size={15} className="text-gray-400 cursor-pointer" />
             </div>
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
-              <div className="flex-shrink-0">
-                <div className="h-[105px] w-[105px] sm:h-[115px] sm:w-[115px]">
+              <div className="shrink-0">
+                <div className="h-26.25 w-26.25 sm:h-28.75 sm:w-28.75">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie data={apiDonut} cx="50%" cy="50%" innerRadius={33} outerRadius={50} dataKey="value" strokeWidth={2} stroke="#fff">
@@ -911,7 +718,7 @@ export default function PayoutReport() {
           <Card>
             <p className="text-xs sm:text-sm font-semibold text-gray-800 mb-2 sm:mb-3">Payouts by Merchant (Top 5)</p>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[500px] text-[10px] sm:text-xs">
+              <table className="w-full min-w-125 text-[10px] sm:text-xs">
                 <thead>
                   <tr className="border-b border-gray-100 text-gray-800">
                     <th className="text-left pb-2 font-medium">Merchant</th>
@@ -924,7 +731,7 @@ export default function PayoutReport() {
                   {merchantTable.length > 0 ? (
                     merchantTable.map(({ name, payouts, amount, rate }) => (
                       <tr key={name} className="border-b border-gray-50 last:border-0">
-                        <td className="py-1.5 sm:py-2 text-gray-700 font-medium truncate max-w-[100px] sm:max-w-none">{name}</td>
+                        <td className="py-1.5 sm:py-2 text-gray-700 font-medium truncate max-w-25 sm:max-w-none">{name}</td>
                         <td className="py-1.5 sm:py-2 text-right text-gray-700 font-medium">{payouts}</td>
                         <td className="py-1.5 sm:py-2 text-right font-semibold text-gray-900">{amount}</td>
                         <td className="py-1.5 sm:py-2 text-right text-gray-700 font-medium">
@@ -961,7 +768,7 @@ export default function PayoutReport() {
             <p className="text-xs sm:text-sm font-semibold text-gray-800 mb-3 sm:mb-4">Payouts by Reason (Failed)</p>
             <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3">
               <div className="shrink-0">
-                <div className="h-[100px] w-[100px] sm:h-[110px] sm:w-[110px]">
+                <div className="h-25 w-25 sm:h-27.5 sm:w-27.5">
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie data={failData} cx="50%" cy="50%" innerRadius={30} outerRadius={48} dataKey="count" strokeWidth={2} stroke="#fff">

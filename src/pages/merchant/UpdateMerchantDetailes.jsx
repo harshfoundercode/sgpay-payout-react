@@ -1,5 +1,6 @@
-import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+// src/pages/merchant/EditMerchant.jsx
+import { useState, useRef, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import merchantService from "../../services/MerchantListServices";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -17,7 +18,7 @@ function Input({ placeholder, type = "text", value, onChange, className = "", su
       {prefix && <span className="absolute left-3 text-[11px] sm:text-xs text-gray-400">{prefix}</span>}
       <input
         type={type}
-        value={value}
+        value={value || ''}
         onChange={onChange}
         readOnly={readOnly}
         placeholder={placeholder}
@@ -32,7 +33,7 @@ function Select({ value, onChange, options, placeholder, error }) {
   return (
     <div className="relative">
       <select
-        value={value}
+        value={value || ''}
         onChange={onChange}
         className={`w-full border rounded-lg px-3 py-1.5 sm:py-2 text-[12px] sm:text-sm text-gray-800 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-400 bg-white appearance-none cursor-pointer transition-all ${error ? "border-red-400 focus:ring-red-100" : "border-gray-200"}`}
       >
@@ -60,8 +61,82 @@ function SectionCard({ number, title, children }) {
   );
 }
 
-// ── UploadField with file management ──
-function UploadField({ label, required, onFileChange, fileName, fileSize, accept = ".pdf,.jpg,.jpeg,.png", maxSize = 5 }) {
+// ─── Document Preview Component ──────────────────────────────────────────────
+function DocumentPreview({ filePath, label }) {
+    const [isOpen, setIsOpen] = useState(false);
+
+    if (!filePath) return null;
+
+    const baseURL = 'https://root.payoutpanel.com/';
+    const fullUrl = `${baseURL}${filePath}`;
+    const fileName = filePath.split('/').pop();
+
+    const getFileExtension = (path) => {
+        if (!path) return '';
+        const parts = path.split('.');
+        return parts[parts.length - 1].toLowerCase();
+    };
+
+    const ext = getFileExtension(filePath);
+    const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext);
+
+    return (
+        <div className="flex items-center gap-3 py-2 border-b border-gray-100 last:border-0">
+            <div className="flex-1 min-w-0">
+                <span className="text-[10px] sm:text-[11px] text-gray-500">{label}</span>
+                <p className="text-[10px] sm:text-xs text-gray-700 truncate">{fileName}</p>
+            </div>
+            <div className="flex items-center gap-2">
+                {isImage ? (
+                    <>
+                        <button
+                            onClick={() => setIsOpen(true)}
+                            className="px-2 py-1 text-[10px] font-medium text-blue-600 border border-blue-200 rounded-lg hover:bg-blue-50 transition-colors"
+                        >
+                            View
+                        </button>
+                        {/* Image Modal */}
+                        {isOpen && (
+                            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" onClick={() => setIsOpen(false)}>
+                                <div className="relative max-w-4xl max-h-[90vh] bg-white rounded-xl overflow-hidden" onClick={(e) => e.stopPropagation()}>
+                                    <button
+                                        onClick={() => setIsOpen(false)}
+                                        className="absolute top-2 right-2 z-10 w-8 h-8 bg-black/50 text-white rounded-full flex items-center justify-center hover:bg-black/70 transition-colors"
+                                    >
+                                        ✕
+                                    </button>
+                                    <img
+                                        src={fullUrl}
+                                        alt={label}
+                                        className="max-w-full max-h-[85vh] object-contain"
+                                        onError={(e) => {
+                                            e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24" fill="none" stroke="%239ca3af" stroke-width="2"%3E%3Cpath d="M4 4v16h16V4H4zm2 2h12v12H6V6zm2 2v8h8V8H8z"/%3E%3C/svg%3E';
+                                        }}
+                                    />
+                                    <div className="absolute bottom-0 left-0 right-0 bg-linear-to-t from-black/60 to-transparent p-3">
+                                        <p className="text-white text-xs text-center">{label}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </>
+                ) : (
+                    <a
+                        href={fullUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-2 py-1 text-[10px] font-medium text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                        View
+                    </a>
+                )}
+            </div>
+        </div>
+    );
+}
+
+// ─── UploadField with file management ──
+function UploadField({ label, required, onFileChange, fileName, fileSize, existingFile, accept = ".pdf,.jpg,.jpeg,.png", maxSize = 5 }) {
   const [file, setFile] = useState(null);
   const [error, setError] = useState('');
   const ref = useRef();
@@ -156,6 +231,12 @@ function UploadField({ label, required, onFileChange, fileName, fileSize, accept
         onChange={handleFileSelect}
       />
 
+      {!displayFileName && existingFile && !file && (
+        <div className="mt-1 text-[10px] text-gray-500">
+          Current file: <span className="font-medium text-gray-700">{existingFile.split('/').pop()}</span>
+        </div>
+      )}
+
       {!displayFileName && (
         <div className="mt-1 border-2 border-dashed border-gray-200 rounded-lg p-2 text-center">
           <p className="text-[9px] sm:text-[10px] text-gray-400">
@@ -186,10 +267,18 @@ const EMPTY_FORM = {
   minPayout: "1", maxPayout: "50,000", dailyLimit: "10,00,000", monthlyLimit: "1,00,00,000",
   settlementCycle: "Instant", autoSettlement: true,
   merchantStatus: "active",
+  merchantId: "",
+  // Document file paths from API
+  panCardFile: "",
+  gstCertificateFile: "",
+  cancelledChequeFile: "",
+  registrationCertificateFile: "",
+  ownerIdProofFile: ""
 };
 
-export default function CreateMerchantPage() {
+export default function EditMerchantPage() {
   const navigate = useNavigate();
+  const { id } = useParams();
   const dropRef = useRef();
 
   const [form, setForm] = useState(EMPTY_FORM);
@@ -200,6 +289,7 @@ export default function CreateMerchantPage() {
   const [apiKey, setApiKey] = useState("");
   const [secretKey, setSecretKey] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [errors, setErrors] = useState({});
   const [toast, setToast] = useState(null);
 
@@ -236,7 +326,75 @@ export default function CreateMerchantPage() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  // ── Validation ──
+  // ─── Fetch Merchant Details ──────────────────────────────────────────────
+  useEffect(() => {
+    const fetchMerchant = async () => {
+      try {
+        const response = await merchantService.getMerchantDetails(id);
+        console.log("Merchant Details:", response);
+        
+        // Auto-fill form with merchant data
+        setForm({
+          merchantName: response.merchant_name || "",
+          businessName: response.business_name || "",
+          email: response.email || "",
+          mobile: response.mobile || "",
+          password: "",
+          confirmPassword: "",
+          businessType: response.business_type || "",
+          gst: response.gst_number || "",
+          pan: response.pan_number || "",
+          websiteUrl: response.website_url || "",
+          businessAddress: response.business_address || "",
+          city: response.city || "",
+          state: response.state || "",
+          pincode: response.pincode || "",
+          accountHolder: response.account_holder_name || "",
+          bankName: response.bank_name || "",
+          accountNumber: response.account_number || "",
+          confirmAccount: response.account_number || "",
+          ifsc: response.ifsc_code || "",
+          branchName: response.branch_name || "",
+          webhookUrl: response.webhook_url || "",
+          enableWebhook: response.webhook_enabled ? "yes" : "no",
+          minPayout: response.min_payout_amount || "1",
+          maxPayout: response.max_payout_amount || "50,000",
+          dailyLimit: response.daily_limit || "10,00,000",
+          monthlyLimit: response.monthly_limit || "1,00,00,000",
+          settlementCycle: response.settlement_cycle || "Instant",
+          autoSettlement: response.auto_settlement ? true : false,
+          merchantStatus: response.merchant_status || "active",
+          merchantId: response.merchant_id || "",
+          // Document file paths
+          panCardFile: response.pan_card_file || "",
+          gstCertificateFile: response.gst_certificate_file || "",
+          cancelledChequeFile: response.cancelled_cheque_file || "",
+          registrationCertificateFile: response.company_registration_certificate_file || "",
+          ownerIdProofFile: response.owner_id_proof_file || ""
+        });
+
+        setApiKey(response.api_key || "");
+        setSecretKey(response.secret_key || "");
+
+        if (response.ifsc_code) {
+          setIfscVerified(true);
+        }
+      } catch (error) {
+        console.error("Error fetching merchant:", error);
+        showToast("Failed to load merchant details", true);
+      } finally {
+        setFetching(false);
+      }
+    };
+
+    if (id) {
+      fetchMerchant();
+    } else {
+      navigate("/all-merchant");
+    }
+  }, [id, navigate]);
+
+  // ─── Validation ──
   const validateForm = () => {
     const newErrors = {};
 
@@ -252,16 +410,6 @@ export default function CreateMerchantPage() {
       newErrors.mobile = "Mobile number is required";
     } else if (!/^[0-9]{10}$/.test(form.mobile)) {
       newErrors.mobile = "Invalid mobile number (10 digits)";
-    }
-    if (!form.password) {
-      newErrors.password = "Password is required";
-    } else if (form.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-    }
-    if (!form.confirmPassword) {
-      newErrors.confirmPassword = "Please confirm password";
-    } else if (form.password !== form.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
     }
 
     // Business Information
@@ -304,8 +452,8 @@ export default function CreateMerchantPage() {
     return Object.keys(newErrors).length === 0;
   };
 
-  // ── Handle Create ──
-  const handleCreate = async () => {
+  // ── Handle Update ──
+  const handleUpdate = async () => {
     if (!validateForm()) {
       const firstError = Object.keys(errors)[0];
       if (firstError) {
@@ -320,21 +468,21 @@ export default function CreateMerchantPage() {
     try {
       const submitData = {
         ...form,
-        apiKey: apiKey || genKey(),
-        secretKey: secretKey || genKey(40)
+        apiKey: apiKey,
+        secretKey: secretKey
       };
 
-      const response = await merchantService.createMerchant(submitData, files);
+      const response = await merchantService.updateMerchant(id, submitData, files);
       
-      showToast("Merchant created successfully!", false);
+      showToast("Merchant updated successfully!", false);
       
       setTimeout(() => {
         navigate("/all-merchant");
       }, 1500);
     } catch (error) {
-      console.error('Create merchant error:', error);
+      console.error('Update merchant error:', error);
       
-      let errorMessage = 'Failed to create merchant. Please try again.';
+      let errorMessage = 'Failed to update merchant. Please try again.';
       
       if (error.response) {
         const status = error.response.status;
@@ -363,6 +511,29 @@ export default function CreateMerchantPage() {
       setLoading(false);
     }
   };
+
+  // ─── Loading State ──────────────────────────────────────────────────────────
+  if (fetching) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading merchant details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // ─── Document files ─────────────────────────────────────────────────────────
+  const documentFiles = [
+    { label: "PAN Card", file: form.panCardFile },
+    { label: "GST Certificate", file: form.gstCertificateFile },
+    { label: "Cancelled Cheque", file: form.cancelledChequeFile },
+    { label: "Company Registration", file: form.registrationCertificateFile },
+    { label: "Owner ID Proof", file: form.ownerIdProofFile },
+  ];
+
+  const hasDocuments = documentFiles.some(doc => doc.file);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -400,17 +571,19 @@ export default function CreateMerchantPage() {
                   Merchants
                 </button>
                 <span className="mx-1">›</span>
-                <span className="text-gray-600">Create Merchant</span>
+                <span className="text-gray-600">Edit Merchant</span>
               </p>
-              <h1 className="text-lg sm:text-xl font-bold text-gray-900">Create Merchant</h1>
-              <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5">Add a new merchant and configure all the required details.</p>
+              <h1 className="text-lg sm:text-xl font-bold text-gray-900">Edit Merchant</h1>
+              <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5">
+                Update merchant details and configuration.
+              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2 bg-amber-50 border border-amber-100 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 self-start sm:self-auto">
-            <div className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" />
-            <span className="text-[11px] sm:text-xs font-medium text-amber-600">
-              {loading ? "Creating..." : "Unsaved Draft"}
+          <div className="flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 self-start sm:self-auto">
+            <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
+            <span className="text-[11px] sm:text-xs font-medium text-blue-600">
+              ID: {form.merchantId || id}
             </span>
           </div>
         </div>
@@ -482,9 +655,9 @@ export default function CreateMerchantPage() {
                     {errors.mobile && <p className="text-[10px] text-red-500 mt-0.5">{errors.mobile}</p>}
                   </div>
                   <div>
-                    <Label required>Password</Label>
+                    <Label>Password <span className="text-gray-400 text-[10px]">(Leave blank to keep current)</span></Label>
                     <Input
-                      placeholder="Enter password"
+                      placeholder="Enter new password (optional)"
                       type={showPass ? "text" : "password"}
                       value={form.password}
                       onChange={set("password")}
@@ -502,9 +675,9 @@ export default function CreateMerchantPage() {
                     {errors.password && <p className="text-[10px] text-red-500 mt-0.5">{errors.password}</p>}
                   </div>
                   <div>
-                    <Label required>Confirm Password</Label>
+                    <Label>Confirm Password</Label>
                     <Input
-                      placeholder="Confirm password"
+                      placeholder="Confirm new password"
                       type={showConfirm ? "text" : "password"}
                       value={form.confirmPassword}
                       onChange={set("confirmPassword")}
@@ -689,12 +862,12 @@ export default function CreateMerchantPage() {
                     <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <p className="text-[11px] sm:text-xs text-blue-600">API credentials will be auto-generated for the merchant.</p>
+                    <p className="text-[11px] sm:text-xs text-blue-600">API credentials for the merchant.</p>
                   </div>
                   <div>
                     <Label>Merchant ID</Label>
                     <div className="relative">
-                      <input readOnly value="Auto generated" className="w-full border border-gray-200 rounded-lg px-3 py-1.5 sm:py-2 text-[12px] sm:text-sm text-gray-400 bg-gray-50 outline-none pr-8 sm:pr-10" />
+                      <input readOnly value={form.merchantId || "Auto generated"} className="w-full border border-gray-200 rounded-lg px-3 py-1.5 sm:py-2 text-[12px] sm:text-sm text-gray-400 bg-gray-50 outline-none pr-8 sm:pr-10" />
                       <button className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
                         <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
@@ -725,7 +898,7 @@ export default function CreateMerchantPage() {
                         onClick={() => setApiKey(genKey())}
                         className="px-3 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white text-[11px] sm:text-xs font-semibold rounded-lg whitespace-nowrap transition-colors"
                       >
-                        Generate API Key
+                        Regenerate API Key
                       </button>
                     </div>
                   </div>
@@ -752,7 +925,7 @@ export default function CreateMerchantPage() {
                         onClick={() => setSecretKey(genKey(40))}
                         className="px-3 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white text-[11px] sm:text-xs font-semibold rounded-lg whitespace-nowrap transition-colors"
                       >
-                        Generate Secret Key
+                        Regenerate Secret Key
                       </button>
                     </div>
                   </div>
@@ -928,7 +1101,7 @@ export default function CreateMerchantPage() {
           <div className="lg:w-80 xl:w-96 shrink-0">
             <div className="space-y-3 sm:space-y-4 sticky top-5">
 
-              {/* Merchant Summary - Fully Dynamic */}
+              {/* Merchant Summary */}
               <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
                 <h2 className="text-xs sm:text-sm font-bold text-gray-800 mb-2.5 sm:mb-3">Merchant Summary</h2>
                 <div className="space-y-2">
@@ -975,66 +1148,69 @@ export default function CreateMerchantPage() {
                 </div>
               </div>
 
-              {/* Documents Upload */}
+              {/* ─── Documents Section with Preview ─── */}
               <div className="bg-white rounded-xl border border-gray-200 p-3 sm:p-4">
                 <div className="flex items-center gap-2 sm:gap-2.5 mb-2.5 sm:mb-3">
                   <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-blue-600 text-white text-[11px] sm:text-xs font-bold flex items-center justify-center shrink-0">9</span>
-                  <h2 className="text-xs sm:text-sm font-bold text-gray-800">Documents Upload</h2>
+                  <h2 className="text-xs sm:text-sm font-bold text-gray-800">Documents</h2>
                 </div>
+                
+                {/* Existing Documents Preview */}
+                {hasDocuments && (
+                  <div className="mb-4">
+                    <p className="text-[10px] text-gray-500 mb-2">Current Documents</p>
+                    <div className="bg-gray-50 rounded-lg p-2">
+                      {documentFiles.map((doc, index) => (
+                        doc.file && (
+                          <DocumentPreview
+                            key={index}
+                            label={doc.label}
+                            filePath={doc.file}
+                          />
+                        )
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Upload New Files */}
                 <div>
+                  <p className="text-[10px] text-gray-500 mb-2">Upload New Files (Optional)</p>
                   <UploadField 
                     label="PAN Card" 
-                    required 
                     onFileChange={setFile('panCard')}
                     fileName={files.panCard?.name}
                     fileSize={files.panCard?.size}
+                    existingFile={form.panCardFile}
                   />
                   <UploadField 
                     label="GST Certificate" 
-                    required 
                     onFileChange={setFile('gstCertificate')}
                     fileName={files.gstCertificate?.name}
                     fileSize={files.gstCertificate?.size}
+                    existingFile={form.gstCertificateFile}
                   />
                   <UploadField 
                     label="Cancelled Cheque" 
-                    required 
                     onFileChange={setFile('cancelledCheque')}
                     fileName={files.cancelledCheque?.name}
                     fileSize={files.cancelledCheque?.size}
+                    existingFile={form.cancelledChequeFile}
                   />
                   <UploadField 
-                    label="Company Registration Certificate" 
-                    required 
+                    label="Company Registration" 
                     onFileChange={setFile('registrationCertificate')}
                     fileName={files.registrationCertificate?.name}
                     fileSize={files.registrationCertificate?.size}
+                    existingFile={form.registrationCertificateFile}
                   />
                   <UploadField 
                     label="Owner ID Proof" 
-                    required 
                     onFileChange={setFile('ownerIdProof')}
                     fileName={files.ownerIdProof?.name}
                     fileSize={files.ownerIdProof?.size}
+                    existingFile={form.ownerIdProofFile}
                   />
-                </div>
-                <div
-                  ref={dropRef}
-                  onDragOver={e => e.preventDefault()}
-                  onDrop={e => e.preventDefault()}
-                  className="mt-3 sm:mt-4 border-2 border-dashed border-gray-200 rounded-xl p-3 sm:p-5 text-center hover:border-blue-300 hover:bg-blue-50/30 transition-all cursor-pointer"
-                >
-                  <div className="w-8 h-8 sm:w-10 sm:h-10 bg-blue-50 rounded-xl flex items-center justify-center mx-auto mb-1.5 sm:mb-2">
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                    </svg>
-                  </div>
-                  <p className="text-[11px] sm:text-xs text-gray-500">Drag & drop files here</p>
-                  <p className="text-[10px] sm:text-xs text-gray-400 my-1">or</p>
-                  <button className="text-[11px] sm:text-xs font-medium text-gray-700 border border-gray-200 rounded-lg px-2.5 sm:px-3 py-1 sm:py-1.5 hover:bg-gray-50 transition-colors">
-                    Browse Files
-                  </button>
-                  <p className="text-[9px] sm:text-[10px] text-gray-400 mt-1.5 sm:mt-2">Allowed files: PDF, JPG, PNG (Max 5MB each)</p>
                 </div>
               </div>
             </div>
@@ -1046,51 +1222,17 @@ export default function CreateMerchantPage() {
           <button 
             className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-[12px] sm:text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors w-full sm:w-auto"
             onClick={() => {
-              setForm(EMPTY_FORM);
-              setApiKey("");
-              setSecretKey("");
-              setFiles({
-                panCard: null,
-                gstCertificate: null,
-                cancelledCheque: null,
-                registrationCertificate: null,
-                ownerIdProof: null
-              });
-              setErrors({});
-              showToast("Form reset successfully!", false);
+              window.location.reload();
             }}
             disabled={loading}
           >
             <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
             </svg>
-            Save Draft
+            Reset Changes
           </button>
 
           <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
-            <button
-              onClick={() => {
-                setForm(EMPTY_FORM);
-                setApiKey("");
-                setSecretKey("");
-                setFiles({
-                  panCard: null,
-                  gstCertificate: null,
-                  cancelledCheque: null,
-                  registrationCertificate: null,
-                  ownerIdProof: null
-                });
-                setErrors({});
-              }}
-              className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 text-[12px] sm:text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors w-full sm:w-auto"
-              disabled={loading}
-            >
-              <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Reset Form
-            </button>
-
             <button
               onClick={() => navigate("/all-merchant")}
               className="px-3 sm:px-4 py-1.5 sm:py-2 text-[12px] sm:text-sm font-medium text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors w-full sm:w-auto"
@@ -1100,7 +1242,7 @@ export default function CreateMerchantPage() {
             </button>
 
             <button
-              onClick={handleCreate}
+              onClick={handleUpdate}
               disabled={loading}
               className="flex items-center justify-center gap-1.5 sm:gap-2 px-4 sm:px-5 py-1.5 sm:py-2 bg-blue-600 hover:bg-blue-700 text-white text-[12px] sm:text-sm font-semibold rounded-lg transition-colors shadow-sm w-full sm:w-auto disabled:opacity-70 disabled:cursor-not-allowed"
             >
@@ -1110,14 +1252,14 @@ export default function CreateMerchantPage() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Creating...
+                  Updating...
                 </>
               ) : (
                 <>
                   <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                   </svg>
-                  Create Merchant
+                  Update Merchant
                 </>
               )}
             </button>

@@ -18,7 +18,7 @@ function Badge({ label, styleMap }) {
   // Convert label to lowercase for matching
   const labelKey = label?.toLowerCase() || '';
   const matchedKey = Object.keys(styleMap).find(key => key.toLowerCase() === labelKey);
-  
+
   return (
     <span className={`px-1.5 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-medium whitespace-nowrap ${styleMap[matchedKey] ?? "bg-gray-100 text-gray-600"}`}>
       {label}
@@ -30,7 +30,7 @@ function Badge({ label, styleMap }) {
 function StatCard({ icon, iconBg, label, value, sub, subColor }) {
   return (
     <div className="bg-white rounded-xl p-2 sm:p-3 border border-gray-100 flex items-center gap-2 sm:gap-4">
-      <div className={`w-8 h-8 sm:w-10 sm:h-10 ${iconBg} rounded-full flex items-center justify-center flex-shrink-0`}>
+      <div className={`w-8 h-8 sm:w-10 sm:h-10 ${iconBg} rounded-full flex items-center justify-center shrink-0`}>
         {icon}
       </div>
       <div className="min-w-0 flex-1 space-y-0.5 sm:space-y-1">
@@ -63,31 +63,31 @@ export default function MerchantListPage() {
     page: 1,
     limit: 10
   });
-  
+
   const navigate = useNavigate();
 
   // Fetch merchants from API
   const fetchMerchants = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       // Build params
       const params = {
         page: page,
         limit: limit
       };
-      
+
       // Add search if present
       if (search) {
         params.search = search;
       }
-      
+
       // Add status filter if not "All Status"
       if (selectedStatus !== "All Status") {
         params.status = selectedStatus.toLowerCase();
       }
-      
+
       const response = await merchantService.getMerchants(params);
       setMerchantData(response);
     } catch (err) {
@@ -121,9 +121,9 @@ export default function MerchantListPage() {
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-IN', { 
-      day: '2-digit', 
-      month: 'short', 
+    return date.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
       year: 'numeric',
       hour: '2-digit',
       minute: '2-digit'
@@ -178,31 +178,31 @@ export default function MerchantListPage() {
         <StatCard
           iconBg="bg-blue-50"
           icon={<svg className="w-4 h-4 sm:w-5 sm:h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>}
-          label="Total Merchants" 
-          value={merchantData.stats?.total?.toLocaleString() || '0'} 
+          label="Total Merchants"
+          value={merchantData.stats?.total?.toLocaleString() || '0'}
           sub="All Time"
         />
         <StatCard
           iconBg="bg-green-50"
           icon={<svg className="w-4 h-4 sm:w-5 sm:h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
-          label="Active Merchants" 
-          value={merchantData.stats?.active?.toLocaleString() || '0'} 
+          label="Active Merchants"
+          value={merchantData.stats?.active?.toLocaleString() || '0'}
           sub={merchantData.stats?.total > 0 ? `${((parseInt(merchantData.stats.active) / merchantData.stats.total) * 100).toFixed(1)}%` : '0%'}
           subColor="text-green-600"
         />
         <StatCard
           iconBg="bg-red-50"
           icon={<svg className="w-4 h-4 sm:w-5 sm:h-5 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>}
-          label="Inactive Merchants" 
-          value={merchantData.stats?.inactive?.toLocaleString() || '0'} 
+          label="Inactive Merchants"
+          value={merchantData.stats?.inactive?.toLocaleString() || '0'}
           sub={merchantData.stats?.total > 0 ? `${((parseInt(merchantData.stats.inactive) / merchantData.stats.total) * 100).toFixed(1)}%` : '0%'}
           subColor="text-red-500"
         />
         <StatCard
           iconBg="bg-orange-50"
           icon={<svg className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>}
-          label="Pending Approval" 
-          value={merchantData.stats?.pending?.toLocaleString() || '0'} 
+          label="Pending Approval"
+          value={merchantData.stats?.pending?.toLocaleString() || '0'}
           sub={merchantData.stats?.total > 0 ? `${((parseInt(merchantData.stats.pending) / merchantData.stats.total) * 100).toFixed(1)}%` : '0%'}
           subColor="text-orange-500"
         />
@@ -228,7 +228,7 @@ export default function MerchantListPage() {
           </div>
 
           <div className="relative w-full sm:w-auto">
-            <select 
+            <select
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="w-full appearance-none pl-2.5 sm:pl-3 pr-7 sm:pr-8 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-100 cursor-pointer"
@@ -243,7 +243,7 @@ export default function MerchantListPage() {
             </svg>
           </div>
 
-          <button 
+          <button
             onClick={fetchMerchants}
             className="flex items-center justify-center gap-1 px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors w-full sm:w-auto"
             disabled={loading}
@@ -273,7 +273,7 @@ export default function MerchantListPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <p className="mt-3 text-sm text-red-500">{error}</p>
-              <button 
+              <button
                 onClick={fetchMerchants}
                 className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
               >
@@ -286,7 +286,7 @@ export default function MerchantListPage() {
         {/* Table - Horizontal scroll on mobile */}
         {!loading && !error && (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[1000px] text-sm">
+            <table className="w-full min-w-250 text-sm">
               <thead>
                 <tr className="bg-gray-50 border-b border-gray-100">
                   {["Merchant ID", "Business Name", "Contact Person", "Mobile", "Email", "Business Type", "Status", "Created Date", "Actions"].map(col => (
@@ -314,7 +314,7 @@ export default function MerchantListPage() {
                           {m.merchant_id || m.id}
                         </button>
                       </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-gray-800 font-medium whitespace-nowrap text-[11px] sm:text-xs max-w-[150px] truncate">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-gray-800 font-medium whitespace-nowrap text-[11px] sm:text-xs max-w-37.5 truncate">
                         {m.business_name || m.merchant_name}
                       </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 text-gray-600 whitespace-nowrap text-[11px] sm:text-xs">
@@ -323,16 +323,16 @@ export default function MerchantListPage() {
                       <td className="px-3 sm:px-4 py-2 sm:py-3 text-gray-600 whitespace-nowrap text-[11px] sm:text-xs">
                         {m.mobile || '-'}
                       </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-gray-500 whitespace-nowrap text-[11px] sm:text-xs max-w-[150px] truncate">
+                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-gray-500 whitespace-nowrap text-[11px] sm:text-xs max-w-37.5 truncate">
                         {m.email || '-'}
                       </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 text-gray-600 whitespace-nowrap text-[11px] sm:text-xs">
                         {m.business_type || '-'}
                       </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 whitespace-nowrap">
-                        <Badge 
-                          label={getStatusDisplay(m.merchant_status || m.status)} 
-                          styleMap={STATUS_STYLES} 
+                        <Badge
+                          label={getStatusDisplay(m.merchant_status || m.status)}
+                          styleMap={STATUS_STYLES}
                         />
                       </td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 text-gray-500 whitespace-nowrap text-[11px] sm:text-xs">
@@ -344,6 +344,14 @@ export default function MerchantListPage() {
                             <circle cx="12" cy="5" r="1.5" />
                             <circle cx="12" cy="12" r="1.5" />
                             <circle cx="12" cy="19" r="1.5" />
+                          </svg>
+                        </button>
+                        <button
+                          onClick={() => navigate(`/edit-merchant/${m.id}`)}
+                          className="p-1 hover:bg-gray-100 rounded-md transition-colors text-gray-400 hover:text-blue-600"
+                        >
+                          <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                           </svg>
                         </button>
                       </td>
@@ -364,7 +372,7 @@ export default function MerchantListPage() {
             <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-1.5">
               <div className="flex items-center gap-1.5 mr-0 sm:mr-3">
                 <span className="text-[11px] sm:text-sm text-gray-500">Rows per page</span>
-                <select 
+                <select
                   value={limit}
                   onChange={(e) => {
                     setLimit(parseInt(e.target.value));
@@ -378,14 +386,14 @@ export default function MerchantListPage() {
                   <option value={50}>50</option>
                 </select>
               </div>
-              <button 
-                onClick={() => setPage(p => Math.max(1, p - 1))} 
+              <button
+                onClick={() => setPage(p => Math.max(1, p - 1))}
                 disabled={page === 1}
                 className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition-colors text-sm sm:text-base"
               >
                 ‹
               </button>
-              
+
               {/* Page numbers */}
               {Array.from({ length: Math.min(5, merchantData.totalPages) }, (_, i) => {
                 let p;
@@ -399,8 +407,8 @@ export default function MerchantListPage() {
                   p = page - 2 + i;
                 }
                 return (
-                  <button 
-                    key={p} 
+                  <button
+                    key={p}
                     onClick={() => setPage(p)}
                     className={`w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-[11px] sm:text-sm font-medium transition-colors ${page === p ? "bg-blue-600 text-white" : "border border-gray-200 text-gray-600 hover:bg-gray-50"}`}
                   >
@@ -408,8 +416,8 @@ export default function MerchantListPage() {
                   </button>
                 );
               })}
-              
-              <button 
+
+              <button
                 onClick={() => setPage(p => Math.min(merchantData.totalPages, p + 1))}
                 disabled={page === merchantData.totalPages}
                 className="w-7 h-7 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition-colors text-sm sm:text-base"

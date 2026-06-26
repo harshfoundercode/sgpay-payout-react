@@ -11,15 +11,18 @@ import CreateMerchantPage from '../pages/merchant/AddMerchant';
 import ApiProvidersPage from '../pages/payoutApis/ApiProvider';
 import PayoutRouting from '../pages/Routing';
 import AutoPayout from '../pages/AutoPayout';
-import ReportsOverview from '../pages/reports/TransactionReports';
-import MerchantReport from '../pages/reports/MerchantReports';
+// import ReportsOverview from '../pages/reports/TransactionReports';
+// import MerchantReport from '../pages/reports/MerchantReports';
 import PayoutReport from '../pages/reports/PayoutReports';
-import SettlementReport from '../pages/reports/SettlementReports';
-import SuccessFailureReport from '../pages/reports/SuccessFailureReports';
+// import SettlementReport from '../pages/reports/SettlementReports';
+// import SuccessFailureReport from '../pages/reports/SuccessFailureReports';
 import ApiProviderDetail from '../pages/payoutApis/ApiProviderDetails';
 import ChangePassword from '../pages/ChangePassword';
 import MerchantDetailsPage from '../pages/merchant/merchantDetails';
 import authService from '../services/AuthServices';
+import AddApiProvider from '../pages/payoutApis/CreateApiProvider';
+import EditApiProvider from '../pages/payoutApis/EditApiProvider';
+import EditMerchantPage from '../pages/merchant/UpdateMerchantDetailes';
 
 
 const ProtectedRoute = ({ children }) => {
@@ -49,7 +52,7 @@ const ApiProviderDetailWrapper = () => {
     return <ApiProviderDetail onBack={() => navigate('/payout-apis')} />;
 };
 
-export const AppRoutes = () => { 
+export const AppRoutes = () => {
     return (
         <Routes>
             <Route path="/" element={<Navigate to="/login" replace />} />
@@ -63,16 +66,20 @@ export const AppRoutes = () => {
                 <Route path="/create-merchant" element={<CreateMerchantPage />} />
                 <Route path="/all-merchant" element={<MerchantListPage />} />
                 <Route path="merchants/:id" element={<MerchantDetailsPage />} />
+                  <Route path="/edit-merchant/:id" element={<EditMerchantPage />} />
                 <Route path="/payout-apis" element={<ApiProvidersPageWrapper />} />
                 <Route path="/api-provider-details/:id" element={<ApiProviderDetailWrapper />} />
                 <Route path="/routing" element={<PayoutRouting />} />
                 <Route path="/auto-payout" element={<AutoPayout />} />
-                <Route path="/transaction-report" element={<ReportsOverview />} />
-                <Route path="/merchant-report" element={<MerchantReport />} />
+                {/* <Route path="/transaction-report" element={<ReportsOverview />} /> */}
+                {/* <Route path="/merchant-report" element={<MerchantReport />} /> */}
                 <Route path="/payout-report" element={<PayoutReport />} />
-                <Route path="/settlement-report" element={<SettlementReport />} />
-                <Route path="/success-failure" element={<SuccessFailureReport />} />
+                {/* <Route path="/settlement-report" element={<SettlementReport />} /> */}
+                {/* <Route path="/success-failure" element={<SuccessFailureReport />} /> */}
                 <Route path="/change-password" element={<ChangePassword />} />
+                <Route path="/add-api-provider" element={<AddApiProvider />} />
+                <Route path="/edit-api-provider/:id" element={<EditApiProvider />} /> {/* Add this */}
+                <Route path="/api-provider-details/:id" element={<ApiProviderDetailWrapper />} />
 
             </Route>
 

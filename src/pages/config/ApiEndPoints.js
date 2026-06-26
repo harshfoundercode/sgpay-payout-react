@@ -6,30 +6,29 @@ const API_ENDPOINTS = {
   auth: {
     login: 'admin/login'
   },
-  
+
   // Dashboard endpoints
   dashboard: {
     getOverview: 'dashboard',
   },
 
-  changePass:"admin/change-password",
+  changePass: "admin/change-password",
 
-   merchants: {
+  merchants: {
     list: 'admin/merchants',
-    details:'admin/merchants/',
-    create:'admin/merchants',
-    update:'admin/merchants',
+    details: 'admin/merchants/',
+    create: 'admin/merchants',
+    update: 'admin/merchants',
 
   },
-   payoutApis: {
+  payoutApis: {
     list: 'api-providers',
-    create: 'api-providers/create',
-    update: 'api-providers/update',
-    delete: 'api-providers/delete',
+    create: 'api-providers',
     details: 'api-providers/details',
-    toggleStatus: '/api-providers/toggle-status',
+    update: '/api-providers', // PUT /api/api-providers/:id
+    status: '/api-providers', // PATCH /api/api-providers/:id/status
   },
-  
+
   transactions: {
     list: 'payout-transactions',
     details: 'transactions/details',
@@ -39,10 +38,17 @@ const API_ENDPOINTS = {
     return: 'transactions/return',
   },
 
-  reports:{
-    payout:'payout-report',
+  reports: {
+    payout: 'payout-report',
+  },
+
+  forgetPassword: {
+    forgetPass: 'admin/forgot-password',
+    verifyOtp: 'admin/verify-otp',
+    resetPass: 'admin/reset-password'
+
   }
-      
+
 };
 
 // Helper function to get full URL

@@ -35,32 +35,23 @@ const apiProviderService = {
     }
   },
 
-  /**
-   * Get API provider details by ID
-   * @param {string|number} id - API Provider ID
-   * @returns {Promise} - API response
-   */
-  async getApiProviderDetails(id) {
-    try {
-      console.log('📡 Fetching API provider details for ID:', id);
-      const response = await api.get(`${API_ENDPOINTS.payoutApis.details}/${id}`);
-      console.log('✅ API provider details fetched:', response.data);
-      return response.data;
-    } catch (error) {
-      console.error('❌ Error fetching API provider details:', error);
-      throw error;
-    }
-  },
 
   /**
    * Create new API provider
    * @param {Object} providerData - API provider data
+   * @param {string} providerData.name - Provider name
+   * @param {number} providerData.daily_limit - Daily limit in INR
+   * @param {string} providerData.port - Port number (as string)
+   * @param {string} providerData.status - "active" | "inactive" | "maintenance"
    * @returns {Promise} - API response
    */
   async createApiProvider(providerData) {
     try {
       console.log('📡 Creating API provider:', providerData);
+      
+      // Using API_ENDPOINTS constant
       const response = await api.post(API_ENDPOINTS.payoutApis.create, providerData);
+      
       console.log('✅ API provider created:', response.data);
       return response.data;
     } catch (error) {
@@ -69,57 +60,46 @@ const apiProviderService = {
     }
   },
 
-  /**
-   * Update API provider
+     /**
+   * Update API provider status
    * @param {string|number} id - API Provider ID
-   * @param {Object} providerData - Updated provider data
+   * @param {string} status - "active" | "inactive" | "maintenance"
    * @returns {Promise} - API response
    */
-  async updateApiProvider(id, providerData) {
+  async updateApiProviderStatus(id, status) {
     try {
-      console.log('📡 Updating API provider:', id, providerData);
-      const response = await api.put(`${API_ENDPOINTS.payoutApis.update}/${id}`, providerData);
-      console.log('✅ API provider updated:', response.data);
+      console.log('📡 Updating API provider status:', id, status);
+      
+      // CORRECT URL PATTERN: /api/api-providers/{id}/status
+      const url = `${API_ENDPOINTS.payoutApis.status}/${id}/status`;
+      
+      console.log('🔗 Request URL:', url);
+      
+      const response = await api.patch(url, { status });
+      console.log('✅ API provider status updated:', response.data);
       return response.data;
     } catch (error) {
-      console.error('❌ Error updating API provider:', error);
+      console.error('❌ Error updating API provider status:', error);
       throw error;
     }
   },
 
   /**
-   * Delete API provider
-   * @param {string|number} id - API Provider ID
-   * @returns {Promise} - API response
+   * Get single API provider details (if needed)
    */
-  async deleteApiProvider(id) {
+  async getApiProvider(id) {
     try {
-      console.log('📡 Deleting API provider:', id);
-      const response = await api.delete(`${API_ENDPOINTS.payoutApis.delete}/${id}`);
-      console.log('✅ API provider deleted:', response.data);
+      console.log('📡 Fetching API provider:', id);
+      const response = await api.get(`${API_ENDPOINTS.payoutApis.list}/${id}`);
+      console.log('✅ API provider fetched:', response.data);
       return response.data;
     } catch (error) {
-      console.error('❌ Error deleting API provider:', error);
-      throw error;
-    }
-  },
-
-  /**
-   * Toggle API provider status
-   * @param {string|number} id - API Provider ID
-   * @returns {Promise} - API response
-   */
-  async toggleApiProviderStatus(id) {
-    try {
-      console.log('📡 Toggling API provider status:', id);
-      const response = await api.post(`${API_ENDPOINTS.payoutApis.toggleStatus}/${id}`);
-      console.log('✅ API provider status toggled:', response.data);
-      return response.data;
-    } catch (error) {
-      console.error('❌ Error toggling API provider status:', error);
+      console.error('❌ Error fetching API provider:', error);
       throw error;
     }
   }
+
+
 };
 
 export default apiProviderService;

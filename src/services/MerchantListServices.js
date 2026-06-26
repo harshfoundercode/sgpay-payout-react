@@ -35,23 +35,7 @@ const merchantService = {
         }
     },
 
-    /**
-     * Get merchant details by ID
-     * @param {string|number} id - Merchant ID
-     * @returns {Promise} - API response
-     */
-    async getMerchantDetails(id) {
-        try {
-            console.log('📡 Fetching merchant details for ID:', id);
-            const response = await api.get(`${API_ENDPOINTS.merchants.details}/${id}`);
-            console.log('✅ Merchant details fetched:', response.data);
-            return response.data;
-        } catch (error) {
-            console.error('❌ Error fetching merchant details:', error);
-            throw error;
-        }
-    },
-
+ 
     /**
      * Create new merchant
      * @param {Object} merchantData - Merchant data
@@ -171,40 +155,6 @@ const merchantService = {
     }
   },
 
-    /**
-     * Update merchant
-     * @param {string|number} id - Merchant ID
-     * @param {Object} merchantData - Updated merchant data
-     * @returns {Promise} - API response
-     */
-    async updateMerchant(id, merchantData) {
-        try {
-            console.log('📡 Updating merchant:', id, merchantData);
-            const response = await api.put(`${API_ENDPOINTS.merchants.update}/${id}`, merchantData);
-            console.log('✅ Merchant updated:', response.data);
-            return response.data;
-        } catch (error) {
-            console.error('❌ Error updating merchant:', error);
-            throw error;
-        }
-    },
-
-    /**
-     * Delete merchant
-     * @param {string|number} id - Merchant ID
-     * @returns {Promise} - API response
-     */
-    async deleteMerchant(id) {
-        try {
-            console.log('📡 Deleting merchant:', id);
-            const response = await api.delete(`${API_ENDPOINTS.merchants.delete}/${id}`);
-            console.log('✅ Merchant deleted:', response.data);
-            return response.data;
-        } catch (error) {
-            console.error('❌ Error deleting merchant:', error);
-            throw error;
-        }
-    },
 
     /**
      * Toggle merchant status
@@ -221,7 +171,114 @@ const merchantService = {
             console.error('❌ Error toggling merchant status:', error);
             throw error;
         }
-    }
+    },
+
+      /**
+     * Update merchant
+     * @param {string|number} id - Merchant ID
+     * @param {Object} merchantData - Updated merchant data
+     * @param {Object} files - File objects for uploads (optional)
+     * @returns {Promise} - API response
+     */
+    async updateMerchant(id, merchantData, files = {}) {
+        try {
+            console.log('📡 Updating merchant:', id, merchantData);
+            console.log('📎 Files received:', files);
+
+            // Create FormData for multipart/form-data
+            const formData = new FormData();
+
+            // Format data for API
+            const formattedData = {
+                merchant_name: merchantData.merchantName,
+                business_name: merchantData.businessName,
+                email: merchantData.email,
+                mobile: merchantData.mobile,
+                password: merchantData.password || undefined,
+                business_type: merchantData.businessType,
+                gst_number: merchantData.gst || null,
+                pan_number: merchantData.pan || null,
+                website_url: merchantData.websiteUrl || null,
+                business_address: merchantData.businessAddress,
+                city: merchantData.city,
+                state: merchantData.state,
+                pincode: merchantData.pincode,
+                account_holder_name: merchantData.accountHolder,
+                bank_name: merchantData.bankName,
+                account_number: merchantData.accountNumber,
+                ifsc_code: merchantData.ifsc,
+                branch_name: merchantData.branchName || null,
+                webhook_url: merchantData.webhookUrl || null,
+                webhook_enabled: merchantData.enableWebhook === 'yes' ? 1 : 0,
+                min_payout_amount: parseFloat(merchantData.minPayout.replace(/,/g, '')) || 1,
+                max_payout_amount: parseFloat(merchantData.maxPayout.replace(/,/g, '')) || 50000,
+                daily_limit: parseFloat(merchantData.dailyLimit.replace(/,/g, '')) || 1000000,
+                monthly_limit: parseFloat(merchantData.monthlyLimit.replace(/,/g, '')) || 10000000,
+                settlement_cycle: merchantData.settlementCycle,
+                auto_settlement: merchantData.autoSettlement ? 1 : 0,
+                merchant_status: merchantData.merchantStatus,
+                merchant_id: merchantData.merchantId // Additional param for update
+            };
+
+            console.log('📤 Formatted data:', formattedData);
+
+            // Append all fields to FormData
+            Object.keys(formattedData).forEach(key => {
+                if (formattedData[key] !== undefined && formattedData[key] !== null) {
+                    formData.append(key, String(formattedData[key]));
+                }
+            });
+
+            // Append files if provided
+            if (files.panCard) {
+                formData.append('pan_card_file', files.panCard);
+                console.log('📎 PAN Card attached:', files.panCard.name);
+            }
+            if (files.gstCertificate) {
+                formData.append('gst_certificate_file', files.gstCertificate);
+                console.log('📎 GST Certificate attached:', files.gstCertificate.name);
+            }
+            if (files.cancelledCheque) {
+                formData.append('cancelled_cheque_file', files.cancelledCheque);
+                console.log('📎 Cancelled Cheque attached:', files.cancelledCheque.name);
+            }
+            if (files.registrationCertificate) {
+                formData.append('company_registration_certificate_file', files.registrationCertificate);
+                console.log('📎 Registration Certificate attached:', files.registrationCertificate.name);
+            }
+            if (files.ownerIdProof) {
+                formData.append('owner_id_proof_file', files.ownerIdProof);
+                console.log('📎 Owner ID Proof attached:', files.ownerIdProof.name);
+            }
+
+            const response = await api.put(`${API_ENDPOINTS.merchants.update}/${id}`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            console.log('✅ Merchant updated:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('❌ Error updating merchant:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Get merchant details by ID
+     */
+    async getMerchantDetails(id) {
+        try {
+            console.log('📡 Fetching merchant details for ID:', id);
+            const response = await api.get(`${API_ENDPOINTS.merchants.details}/${id}`);
+            console.log('✅ Merchant details fetched:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('❌ Error fetching merchant details:', error);
+            throw error;
+        }
+    },
 };
 
 export default merchantService;
