@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import DateRangePicker from "../components/DatePicker";
 import transactionService from "../services/TransactionServices";
 import merchantService from "../services/MerchantListServices";
-import { ChevronDown } from "lucide-react"; // Add this import
-
+import { ChevronDown } from "lucide-react";
+import TransactionExportScreen from '../pages/export/TransactionScreenExport';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
 // ─── Icons (inline SVG helpers) ────────────────────────────────────────────
 const Icon = ({ d, size = 16, className = "" }) => (
@@ -86,7 +88,7 @@ const StatusBadge = ({ status }) => {
 };
 
 // ─── Transactions Page ─────────────────────────────────────────────────────
-const TransactionsPage = ({ onViewDetails }) => {
+const TransactionsPage = ({ onViewDetails, onExportClick }) => {
     const [activeTab, setActiveTab] = useState("all");
     const [openMenu, setOpenMenu] = useState(null);
     const [dateRange, setDateRange] = useState(null);
@@ -173,29 +175,24 @@ const TransactionsPage = ({ onViewDetails }) => {
                 limit: limit
             };
             
-            // Search term
             if (searchTerm) {
                 params.search = searchTerm;
             }
             
-            // Status from dropdown or tab
             if (activeTab !== "all") {
                 params.status = activeTab;
             } else if (selectedStatus) {
                 params.status = selectedStatus;
             }
             
-            // Merchant filter
             if (selectedMerchant) {
                 params.merchant_id = selectedMerchant;
             }
             
-            // API filter
             if (selectedApi) {
                 params.api_used = selectedApi;
             }
             
-            // Date range
             if (dateRange) {
                 params.from_date = dateRange.startFormatted;
                 params.to_date = dateRange.endFormatted;
@@ -317,6 +314,21 @@ const TransactionsPage = ({ onViewDetails }) => {
     const totalItems = transactionData.total || 0;
     const totalPages = transactionData.totalPages || 0;
 
+    // ─── Handle Export Click ────────────────────────────────────────────────
+    const handleExportClick = () => {
+        const filters = {};
+        if (searchTerm) filters.search = searchTerm;
+        if (activeTab !== "all") filters.status = activeTab;
+        else if (selectedStatus) filters.status = selectedStatus;
+        if (selectedMerchant) filters.merchant_id = selectedMerchant;
+        if (selectedApi) filters.api_used = selectedApi;
+        if (dateRange) {
+            filters.from_date = dateRange.startFormatted;
+            filters.to_date = dateRange.endFormatted;
+        }
+        onExportClick(filters, transactionData.total || 0);
+    };
+
     return (
         <div className="p-3 sm:p-0">
             {/* Header */}
@@ -330,11 +342,13 @@ const TransactionsPage = ({ onViewDetails }) => {
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-[11px] sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
+                    <button 
+                        onClick={handleExportClick}
+                        className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-[11px] sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm"
+                    >
                         <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d={icons.download} /></svg>
                         Export
                     </button>
-                   
                 </div>
             </div>
 
@@ -638,30 +652,6 @@ const TransactionsPage = ({ onViewDetails }) => {
                                                             </svg>
                                                             View Details
                                                         </button>
-                                                        {/* <button className="flex items-center gap-2 w-full px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                                            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                                                                <path d={icons.refresh} />
-                                                            </svg>
-                                                            Retry Transaction
-                                                        </button>
-                                                        <button className="flex items-center gap-2 w-full px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                                            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                                                                <path d={icons.undo} />
-                                                            </svg>
-                                                            Return to SGPay
-                                                        </button>
-                                                        <button className="flex items-center gap-2 w-full px-3 py-2 text-xs sm:text-sm text-red-600 hover:bg-red-50 transition-colors border-t border-gray-100 mt-1 pt-1">
-                                                            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                                                                <path d={icons.undo} />
-                                                            </svg>
-                                                            Reverse Transaction
-                                                        </button>
-                                                        <button className="flex items-center gap-2 w-full px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                                                            <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
-                                                                <path d={icons.download} />
-                                                            </svg>
-                                                            Download Receipt
-                                                        </button> */}
                                                     </div>
                                                 )}
                                             </td>
@@ -766,6 +756,7 @@ const StatusStep = ({ label, date, time, done, active }) => (
 
 const TransactionDetails = ({ txn, onBack }) => {
     const [activeTab, setActiveTab] = useState("Overview");
+    const [downloadingReceipt, setDownloadingReceipt] = useState(false);
     const detailTabs = ["Overview"];
 
     if (!txn) {
@@ -776,7 +767,7 @@ const TransactionDetails = ({ txn, onBack }) => {
         );
     }
 
-    // Format data for display
+    // ─── Format helpers ──────────────────────────────────────────────────
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
         const date = new Date(dateString);
@@ -801,12 +792,240 @@ const TransactionDetails = ({ txn, onBack }) => {
     const formatCurrency = (amount) => {
         const num = parseFloat(amount);
         if (isNaN(num)) return '₹ 0.00';
-        return `₹ ${num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        return `Rs. ${num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
     };
 
     const getStatusDisplay = (status) => {
         if (!status) return 'Unknown';
         return status.charAt(0).toUpperCase() + status.slice(1);
+    };
+
+    // ─── Download Receipt PDF ──────────────────────────────────────────
+    const downloadReceipt = async () => {
+        setDownloadingReceipt(true);
+        
+        try {
+            const doc = new jsPDF('portrait', 'mm', 'a4');
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            const margin = 15;
+            
+            // ─── Receipt Header ────────────────────────────────────────
+            // Company Logo/Name
+            doc.setFontSize(24);
+            doc.setTextColor(30, 58, 138);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Payment Receipt', pageWidth / 2, 25, { align: 'center' });
+            
+            // Divider
+            doc.setDrawColor(59, 130, 246);
+            doc.setLineWidth(0.5);
+            doc.line(margin, 30, pageWidth - margin, 30);
+            
+            // Receipt Number
+            doc.setFontSize(10);
+            doc.setTextColor(80, 80, 80);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Receipt #: ${txn.trx_id || txn.id || 'N/A'}`, margin, 40);
+            doc.text(`Date: ${formatDate(txn.created_at)} ${formatTime(txn.created_at)}`, pageWidth - margin - 50, 40);
+            
+            // ─── Status Badge ──────────────────────────────────────────
+            const statusColor = {
+                success: [16, 185, 129],
+                failed: [239, 68, 68],
+                processing: [59, 130, 246],
+                initiated: [234, 179, 8],
+                returned: [249, 115, 22]
+            };
+            
+            const statusBgColor = {
+                success: [236, 253, 245],
+                failed: [254, 242, 242],
+                processing: [239, 246, 255],
+                initiated: [254, 252, 232],
+                returned: [255, 247, 237]
+            };
+            
+            const statusKey = txn.status?.toLowerCase() || '';
+            const color = statusColor[statusKey] || [100, 100, 100];
+            const bgColor = statusBgColor[statusKey] || [240, 240, 240];
+            
+            doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
+            doc.setDrawColor(color[0], color[1], color[2]);
+            doc.setFontSize(10);
+            doc.setTextColor(color[0], color[1], color[2]);
+            doc.setFont('helvetica', 'bold');
+            
+          
+            
+            // ─── Amount Section ────────────────────────────────────────
+            let yPos = 55;
+            
+            // Amount Box
+            doc.setFillColor(239, 246, 255);
+            doc.setDrawColor(59, 130, 246);
+            doc.roundedRect(margin, yPos, pageWidth - (margin * 2), 30, 3, 3, 'FD');
+            
+            doc.setFontSize(11);
+            doc.setTextColor(80, 80, 80);
+            doc.setFont('helvetica', 'normal');
+            doc.text('Transaction Amount', margin + 5, yPos + 8);
+            
+            doc.setFontSize(20);
+            doc.setTextColor(30, 58, 138);
+            doc.setFont('helvetica', 'bold');
+            doc.text(formatCurrency(txn.amount), margin + 5, yPos + 24);
+            
+            // ─── Transaction Details ──────────────────────────────────
+            yPos += 45;
+            
+            // Section Title
+            doc.setFontSize(12);
+            doc.setTextColor(30, 58, 138);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Transaction Details', margin, yPos);
+            yPos += 6;
+            
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.3);
+            doc.line(margin, yPos, pageWidth - margin, yPos);
+            yPos += 8;
+            
+            // Details in two columns
+            const col1 = margin;
+            const col2 = pageWidth / 2 + 10;
+            
+            const details = [
+                ['Transaction ID', txn.trx_id || txn.id || 'N/A'],
+                ['Order ID', txn.order_id || 'N/A'],
+                ['Merchant Name', txn.merchant_name || 'N/A'],
+                ['Merchant ID', txn.merchant_id || 'N/A'],
+                ['API Used', txn.api_name || 'N/A'],
+                ['UTR / Ref No.', txn.utr || 'N/A'],
+                ['Source IP', txn.source_ip || 'N/A'],
+                ['Created At', `${formatDate(txn.created_at)} ${formatTime(txn.created_at)}`]
+            ];
+            
+            doc.setFontSize(9);
+            doc.setTextColor(80, 80, 80);
+            doc.setFont('helvetica', 'normal');
+            
+            details.forEach(([label, value], index) => {
+                const x = index < 4 ? col1 : col2;
+                const y = yPos + (index % 4) * 7;
+                
+                doc.setTextColor(100, 100, 100);
+                doc.setFont('helvetica', 'bold');
+                doc.text(label + ':', x, y);
+                
+                doc.setTextColor(30, 30, 30);
+                doc.setFont('helvetica', 'normal');
+                const valueX = x + 35;
+                const maxWidth = 70;
+                const wrappedValue = doc.splitTextToSize(value || '–', maxWidth);
+                doc.text(wrappedValue, valueX, y);
+            });
+            
+            yPos += 32;
+            
+            // ─── Beneficiary Details ──────────────────────────────────
+            doc.setFontSize(12);
+            doc.setTextColor(30, 58, 138);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Beneficiary Information', margin, yPos);
+            yPos += 6;
+            
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.3);
+            doc.line(margin, yPos, pageWidth - margin, yPos);
+            yPos += 8;
+            
+            const beneficiaryDetails = [
+                ['Name', txn.bene_name || 'N/A'],
+                ['Account Number', txn.account_number || 'N/A'],
+                ['IFSC Code', txn.ifsc || 'N/A'],
+                ['Bank Name', txn.bank_name || 'N/A'],
+                ['Phone', txn.phone || 'N/A'],
+                ['Email', txn.email || 'N/A']
+            ];
+            
+            doc.setFontSize(9);
+            doc.setTextColor(80, 80, 80);
+            
+            beneficiaryDetails.forEach(([label, value], index) => {
+                const x = margin;
+                const y = yPos + index * 7;
+                
+                doc.setTextColor(100, 100, 100);
+                doc.setFont('helvetica', 'bold');
+                doc.text(label + ':', x, y);
+                
+                doc.setTextColor(30, 30, 30);
+                doc.setFont('helvetica', 'normal');
+                const valueX = x + 35;
+                const wrappedValue = doc.splitTextToSize(value || '–', 80);
+                doc.text(wrappedValue, valueX, y);
+            });
+            
+            // ─── Charges Section ──────────────────────────────────────
+            yPos += 48;
+            
+            doc.setFontSize(12);
+            doc.setTextColor(30, 58, 138);
+            doc.setFont('helvetica', 'bold');
+            doc.text('Charges Summary', margin, yPos);
+            yPos += 6;
+            
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.3);
+            doc.line(margin, yPos, pageWidth - margin, yPos);
+            yPos += 8;
+            
+            const charges = [
+                ['Charges', formatCurrency(txn.charges || 0)],
+                ['GST', formatCurrency(txn.gst || 0)],
+                ['Total Charges', formatCurrency(txn.total_charges || 0)]
+            ];
+            
+            doc.setFontSize(9);
+            charges.forEach(([label, value], index) => {
+                const x = margin;
+                const y = yPos + index * 7;
+                
+                doc.setTextColor(100, 100, 100);
+                doc.setFont('helvetica', 'bold');
+                doc.text(label + ':', x, y);
+                
+                doc.setTextColor(30, 58, 138);
+                doc.setFont('helvetica', 'bold');
+                const valueX = x + 35;
+                doc.text(value, valueX, y);
+            });
+            
+            // ─── Footer ────────────────────────────────────────────────
+            yPos = pageHeight - 25;
+            
+            doc.setDrawColor(200, 200, 200);
+            doc.setLineWidth(0.3);
+            doc.line(margin, yPos, pageWidth - margin, yPos);
+            yPos += 6;
+            
+            doc.setFontSize(8);
+            doc.setTextColor(150, 150, 150);
+            doc.setFont('helvetica', 'normal');
+            doc.text('This is a computer-generated receipt. No signature required.', pageWidth / 2, yPos + 3, { align: 'center' });
+            doc.text(`Generated on: ${new Date().toLocaleString('en-IN')}`, pageWidth / 2, yPos + 10, { align: 'center' });
+            
+            // ─── Download PDF ──────────────────────────────────────────
+            const fileName = `Receipt_${txn.trx_id || txn.id || 'transaction'}_${new Date().toISOString().split('T')[0]}.pdf`;
+            doc.save(fileName);
+            
+        } catch (err) {
+            console.error('Error downloading receipt:', err);
+            alert('Failed to download receipt. Please try again.');
+        } finally {
+            setDownloadingReceipt(false);
+        }
     };
 
     return (
@@ -829,11 +1048,26 @@ const TransactionDetails = ({ txn, onBack }) => {
                         <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
                         Back
                     </button>
-                    <button className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-[11px] sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm">
-                        <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d={icons.download} /></svg>
-                        Receipt
+                    <button 
+                        onClick={downloadReceipt}
+                        disabled={downloadingReceipt}
+                        className={`flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-[11px] sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm ${downloadingReceipt ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    >
+                        {downloadingReceipt ? (
+                            <>
+                                <svg className="animate-spin h-4 w-4 text-gray-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Downloading...
+                            </>
+                        ) : (
+                            <>
+                                <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d={icons.download} /></svg>
+                                Receipt
+                            </>
+                        )}
                     </button>
-                  
                 </div>
             </div>
 
@@ -949,7 +1183,6 @@ const TransactionDetails = ({ txn, onBack }) => {
                                 <div className="border border-gray-100 rounded-xl p-3 sm:p-4">
                                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                                         <h3 className="text-xs sm:text-sm font-semibold text-gray-900">Beneficiary Information</h3>
-                                        <button className="text-[11px] sm:text-xs text-blue-600 hover:underline text-left">View All</button>
                                     </div>
                                     <div className="flex justify-center mb-3">
                                         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-100 flex items-center justify-center">
@@ -966,25 +1199,6 @@ const TransactionDetails = ({ txn, onBack }) => {
                                     <InfoRow label="Phone" value={txn.phone || 'N/A'} />
                                     <InfoRow label="Email" value={txn.email || 'N/A'} />
                                 </div>
-
-                                {/* Quick Actions */}
-                                {/* <div className="border border-gray-100 rounded-xl p-3 sm:p-4">
-                                    <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">Quick Actions</h3>
-                                    <div className="space-y-1.5 sm:space-y-2">
-                                        <button className="w-full flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-[11px] sm:text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                                            <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d={icons.refresh} /></svg>
-                                            Retry Transaction
-                                        </button>
-                                        <button className="w-full flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-[11px] sm:text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors">
-                                            <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d={icons.undo} /></svg>
-                                            Return to SGPay
-                                        </button>
-                                        <button className="w-full flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 border border-red-200 rounded-lg text-[11px] sm:text-xs font-medium text-red-600 hover:bg-red-50 transition-colors">
-                                            <svg width={11} height={11} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d={icons.undo} /></svg>
-                                            Reverse Transaction
-                                        </button>
-                                    </div>
-                                </div> */}
                             </div>
                         </div>
                     </div>
@@ -1007,6 +1221,9 @@ const TransactionDetails = ({ txn, onBack }) => {
 export default function TransactionScreen() {
     const [page, setPage] = useState("transactions");
     const [selectedTxn, setSelectedTxn] = useState(null);
+    const [showExportModal, setShowExportModal] = useState(false);
+    const [exportFilters, setExportFilters] = useState({});
+    const [totalRecords, setTotalRecords] = useState(0);
 
     const handleViewDetails = (txn) => {
         setSelectedTxn(txn);
@@ -1018,10 +1235,27 @@ export default function TransactionScreen() {
         setSelectedTxn(null);
     };
 
+    const handleExportClick = (filters, total) => {
+        setExportFilters(filters);
+        setTotalRecords(total);
+        setShowExportModal(true);
+    };
+
     return (
         <div className="w-full bg-gray-50">
             {page === "transactions" ? (
-                <TransactionsPage onViewDetails={handleViewDetails} />
+                <>
+                    <TransactionsPage 
+                        onViewDetails={handleViewDetails} 
+                        onExportClick={handleExportClick}
+                    />
+                    <TransactionExportScreen
+                        isOpen={showExportModal}
+                        onClose={() => setShowExportModal(false)}
+                        filters={exportFilters}
+                        totalRecords={totalRecords}
+                    />
+                </>
             ) : (
                 <TransactionDetails txn={selectedTxn} onBack={handleBack} />
             )}
