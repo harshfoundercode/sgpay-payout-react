@@ -638,7 +638,7 @@ const TransactionsPage = ({ onViewDetails }) => {
                                                             </svg>
                                                             View Details
                                                         </button>
-                                                        <button className="flex items-center gap-2 w-full px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                                                        {/* <button className="flex items-center gap-2 w-full px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition-colors">
                                                             <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
                                                                 <path d={icons.refresh} />
                                                             </svg>
@@ -661,7 +661,7 @@ const TransactionsPage = ({ onViewDetails }) => {
                                                                 <path d={icons.download} />
                                                             </svg>
                                                             Download Receipt
-                                                        </button>
+                                                        </button> */}
                                                     </div>
                                                 )}
                                             </td>
@@ -968,7 +968,7 @@ const TransactionDetails = ({ txn, onBack }) => {
                                 </div>
 
                                 {/* Quick Actions */}
-                                <div className="border border-gray-100 rounded-xl p-3 sm:p-4">
+                                {/* <div className="border border-gray-100 rounded-xl p-3 sm:p-4">
                                     <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">Quick Actions</h3>
                                     <div className="space-y-1.5 sm:space-y-2">
                                         <button className="w-full flex items-center justify-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-[11px] sm:text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors">
@@ -984,7 +984,7 @@ const TransactionDetails = ({ txn, onBack }) => {
                                             Reverse Transaction
                                         </button>
                                     </div>
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     </div>

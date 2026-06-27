@@ -112,13 +112,13 @@ function ActionMenu({ providerId, onViewDetail, onClose, onEdit, onStatusToggle 
     { Icon: Edit2, label: "Edit API", color: "text-gray-700", action: "edit" },
     { Icon: CheckCircle, label: "Enable API", color: "text-green-600", action: "enable" },
     { Icon: XCircle, label: "Disable API", color: "text-orange-500", action: "disable" },
-    { Icon: Wrench, label: "Maintenance Mode", color: "text-purple-600", action: "maint" },
+    // { Icon: Wrench, label: "Maintenance Mode", color: "text-purple-600", action: "maint" },
     { Icon: ArrowUpDown, label: "Set Priority", color: "text-gray-700", action: "priority" },
-    { Icon: Database, label: "API Balances", color: "text-gray-700", action: "balances" },
-    { Icon: Scale, label: "API Limits", color: "text-gray-700", action: "limits" },
-    { Icon: FlaskConical, label: "Test API", color: "text-gray-700", action: "test" },
-    { Icon: FileText, label: "View Logs", color: "text-gray-700", action: "logs" },
-    { Icon: Trash2, label: "Delete API", color: "text-red-600", action: "delete", divider: true },
+    // { Icon: Database, label: "API Balances", color: "text-gray-700", action: "balances" },
+    // { Icon: Scale, label: "API Limits", color: "text-gray-700", action: "limits" },
+    // { Icon: FlaskConical, label: "Test API", color: "text-gray-700", action: "test" },
+    // { Icon: FileText, label: "View Logs", color: "text-gray-700", action: "logs" },
+    // { Icon: Trash2, label: "Delete API", color: "text-red-600", action: "delete", divider: true },
   ];
 
   const handleAction = (action) => {

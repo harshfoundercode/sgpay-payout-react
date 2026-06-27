@@ -602,8 +602,9 @@ function DocumentViewer({ filePath, label }) {
     if (!filePath) return null;
 
     // Construct the full URL
-    const baseURL = 'https://root.payoutpanel.com/';
-    const fullUrl = `${baseURL}${filePath}`;
+    // const baseURL = 'https://root.payoutpanel.com/';
+    // const fullUrl = `${baseURL}${filePath}`;
+    const fullUrl = `${filePath}`;
 
     // Get file extension
     const getFileExtension = (path) => {

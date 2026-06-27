@@ -11,6 +11,9 @@ import {
 import DateRangePicker from "../../components/DatePicker";
 import payoutReportService from "../../services/PayoutReportServices";
 import merchantService from "../../services/MerchantListServices";
+import { Navigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 
@@ -73,6 +76,8 @@ export default function PayoutReport() {
   const [isMerchantOpen, setIsMerchantOpen] = useState(false);
   const [isApiOpen, setIsApiOpen] = useState(false);
   const [isStatusOpen, setIsStatusOpen] = useState(false);
+
+  const navigate = useNavigate();
 
   const [reportData, setReportData] = useState({
     summary: {
@@ -756,7 +761,7 @@ export default function PayoutReport() {
                 </tbody>
               </table>
             </div>
-            <button className="flex items-center gap-1 text-[11px] sm:text-xs text-blue-600 hover:text-blue-800 mt-2 sm:mt-3 font-medium">
+            <button onClick={() => navigate("/all-merchant")} className="flex items-center gap-1 text-[11px] sm:text-xs text-blue-600 hover:text-blue-800 mt-2 sm:mt-3 font-medium">
               View All Merchants <ArrowRight size={11} sm:size={13} />
             </button>
           </Card>
@@ -788,7 +793,7 @@ export default function PayoutReport() {
                 ))}
               </div>
             </div>
-            <button className="flex items-center gap-1 text-[11px] sm:text-xs text-blue-600 hover:text-blue-800 mt-2 sm:mt-3 font-medium">
+            <button onClick={() => navigate("/transactions")} className="flex items-center gap-1 text-[11px] sm:text-xs text-blue-600 hover:text-blue-800 mt-2 sm:mt-3 font-medium">
               View All Reasons <ArrowRight size={11} sm:size={13} />
             </button>
           </Card>
@@ -815,9 +820,7 @@ export default function PayoutReport() {
                 <div className="text-center text-gray-400 py-4">No distribution data available</div>
               )}
             </div>
-            <button className="flex items-center gap-1 text-[11px] sm:text-xs text-blue-600 hover:text-blue-800 mt-3 sm:mt-4 font-medium">
-              View Distribution Report <ArrowRight size={11} sm:size={13} />
-            </button>
+          
           </Card>
         </div>
       </div>

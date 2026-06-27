@@ -67,8 +67,9 @@ function DocumentPreview({ filePath, label }) {
 
     if (!filePath) return null;
 
-    const baseURL = 'https://root.payoutpanel.com/';
-    const fullUrl = `${baseURL}${filePath}`;
+    // const baseURL = 'https://root.payoutpanel.com/';
+    // const fullUrl = `${baseURL}${filePath}`;
+    const fullUrl = `${filePath}`;
     const fileName = filePath.split('/').pop();
 
     const getFileExtension = (path) => {
