@@ -75,11 +75,11 @@ const StatusBadge = ({ status }) => {
         reversed: "bg-purple-100 text-purple-700 border border-purple-200",
         initiated: "bg-yellow-100 text-yellow-700 border border-yellow-200",
     };
-    
+
     const displayStatus = status?.charAt(0).toUpperCase() + status?.slice(1) || status || 'Unknown';
     const key = status?.toLowerCase() || '';
     const matchedKey = Object.keys(statusMap).find(k => k === key);
-    
+
     return (
         <span className={`px-1.5 sm:px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold ${statusMap[matchedKey] || "bg-gray-100 text-gray-600"}`}>
             {displayStatus}
@@ -109,7 +109,7 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
         page: 1,
         limit: 10
     });
-    
+
     // ─── Filter States ───
     const [searchTerm, setSearchTerm] = useState("");
     const [page, setPage] = useState(1);
@@ -119,12 +119,12 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
     const [selectedApi, setSelectedApi] = useState("");
     const [merchants, setMerchants] = useState([]);
     const [loadingMerchants, setLoadingMerchants] = useState(false);
-    
+
     // ─── Dropdown Open States ───
     const [isMerchantOpen, setIsMerchantOpen] = useState(false);
     const [isApiOpen, setIsApiOpen] = useState(false);
     const [isStatusOpen, setIsStatusOpen] = useState(false);
-    
+
     // ─── API Status Options ───
     const statusOptions = [
         { value: "", label: "All Status" },
@@ -168,36 +168,36 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
     const fetchTransactions = async () => {
         setLoading(true);
         setError(null);
-        
+
         try {
             const params = {
                 page: page,
                 limit: limit
             };
-            
+
             if (searchTerm) {
                 params.search = searchTerm;
             }
-            
+
             if (activeTab !== "all") {
                 params.status = activeTab;
             } else if (selectedStatus) {
                 params.status = selectedStatus;
             }
-            
+
             if (selectedMerchant) {
                 params.merchant_id = selectedMerchant;
             }
-            
+
             if (selectedApi) {
                 params.api_used = selectedApi;
             }
-            
+
             if (dateRange) {
                 params.from_date = dateRange.startFormatted;
                 params.to_date = dateRange.endFormatted;
             }
-            
+
             const response = await transactionService.getTransactions(params);
             setTransactionData(response);
         } catch (err) {
@@ -272,9 +272,9 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-IN', { 
-            day: '2-digit', 
-            month: 'short', 
+        return date.toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short',
             year: 'numeric'
         });
     };
@@ -282,8 +282,8 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
     const formatTime = (dateString) => {
         if (!dateString) return 'N/A';
         const date = new Date(dateString);
-        return date.toLocaleTimeString('en-IN', { 
-            hour: '2-digit', 
+        return date.toLocaleTimeString('en-IN', {
+            hour: '2-digit',
             minute: '2-digit',
             hour12: true
         });
@@ -342,7 +342,7 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
                     </div>
                 </div>
                 <div className="flex items-center gap-2">
-                    <button 
+                    <button
                         onClick={handleExportClick}
                         className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-[11px] sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm"
                     >
@@ -355,11 +355,11 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
             {/* ─── Filters Bar ─── */}
             <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-3 sm:p-4 mb-3 sm:mb-4">
                 <div className="flex flex-wrap gap-2 sm:gap-3 mb-3">
-                    <DateRangePicker 
+                    <DateRangePicker
                         onDateChange={handleDateChange}
                         placeholder="Select date range"
                     />
-                    
+
                     {/* ── Merchant Dropdown ── */}
                     <div className="relative">
                         <button
@@ -457,20 +457,20 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
 
                 {/* ─── Search and Action Buttons ─── */}
                 <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-                    <input 
+                    <input
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-[11px] sm:text-xs flex-1 min-w-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 placeholder:text-gray-400" 
-                        placeholder="Transaction ID / Order ID / UTR / Ref No." 
+                        className="px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-[11px] sm:text-xs flex-1 min-w-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 placeholder:text-gray-400"
+                        placeholder="Transaction ID / Order ID / UTR / Ref No."
                     />
                     <div className="flex gap-2 ml-auto w-full sm:w-auto mt-2 sm:mt-0">
-                        <button 
+                        <button
                             onClick={clearFilters}
                             className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-[11px] sm:text-xs text-gray-700 hover:bg-gray-50 transition-colors"
                         >
                             Reset
                         </button>
-                        <button 
+                        <button
                             onClick={fetchTransactions}
                             className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 border border-blue-300 text-blue-700 rounded-lg text-[11px] sm:text-xs font-medium hover:bg-blue-50 transition-colors"
                         >
@@ -519,22 +519,20 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
                         <button
                             key={tab.key}
                             onClick={() => { setActiveTab(tab.key); setPage(1); }}
-                            className={`flex flex-col items-center px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-lg text-[11px] sm:text-sm font-medium transition-colors whitespace-nowrap border ${
-                                activeTab === tab.key
+                            className={`flex flex-col items-center px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-lg text-[11px] sm:text-sm font-medium transition-colors whitespace-nowrap border ${activeTab === tab.key
                                     ? "bg-[#ECF2FE] text-blue-600 border-blue-500"
                                     : "text-gray-600 border-gray-100 hover:bg-blue-50"
-                            }`}
+                                }`}
                         >
                             <span>{tab.label}</span>
-                            <span className={`text-[10px] sm:text-xs font-bold mt-0.5 ${
-                                activeTab === tab.key ? "text-blue-600" : 
-                                tab.key === 'success' ? "text-green-600" :
-                                tab.key === 'failed' ? "text-red-600" :
-                                tab.key === 'returned' ? "text-orange-600" :
-                                tab.key === 'initiated' ? "text-yellow-600" :
-                                tab.key === 'processing' ? "text-blue-600" :
-                                "text-gray-600"
-                            }`}>
+                            <span className={`text-[10px] sm:text-xs font-bold mt-0.5 ${activeTab === tab.key ? "text-blue-600" :
+                                    tab.key === 'success' ? "text-green-600" :
+                                        tab.key === 'failed' ? "text-red-600" :
+                                            tab.key === 'returned' ? "text-orange-600" :
+                                                tab.key === 'initiated' ? "text-yellow-600" :
+                                                    tab.key === 'processing' ? "text-blue-600" :
+                                                        "text-gray-600"
+                                }`}>
                                 {tab.count.toLocaleString()}
                             </span>
                         </button>
@@ -559,7 +557,7 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             <p className="mt-3 text-sm text-red-500">{error}</p>
-                            <button 
+                            <button
                                 onClick={handleRefresh}
                                 className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
                             >
@@ -597,8 +595,8 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
                                                 </span>
                                             </td>
                                             <td className="px-2 sm:px-3 py-2 sm:py-3">
-                                                <span 
-                                                    className="text-[10px] sm:text-xs font-mono text-blue-600 whitespace-nowrap cursor-pointer hover:underline" 
+                                                <span
+                                                    className="text-[10px] sm:text-xs font-mono text-blue-600 whitespace-nowrap cursor-pointer hover:underline"
                                                     onClick={() => onViewDetails(txn)}
                                                 >
                                                     {txn.trx_id || txn.id}
@@ -643,7 +641,7 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
                                                 </button>
                                                 {openMenu === txn.id && (
                                                     <div className="absolute right-0 top-8 z-50 bg-white rounded-xl shadow-xl border border-gray-100 py-1 w-44">
-                                                        <button 
+                                                        <button
                                                             onClick={() => { onViewDetails(txn); setOpenMenu(null); }}
                                                             className="flex items-center gap-2 w-full px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition-colors"
                                                         >
@@ -668,7 +666,7 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-3 sm:px-4 py-3 border-t border-gray-100">
                         <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
                             <span>Rows per page:</span>
-                            <select 
+                            <select
                                 value={limit}
                                 onChange={(e) => { setLimit(parseInt(e.target.value)); setPage(1); }}
                                 className="border border-gray-200 rounded px-2 py-1 text-xs sm:text-sm"
@@ -683,7 +681,7 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
                             Showing {(transactionData.page - 1) * transactionData.limit + 1} to {Math.min(transactionData.page * transactionData.limit, totalItems)} of {totalItems} transactions
                         </span>
                         <div className="flex items-center gap-1">
-                            <button 
+                            <button
                                 onClick={() => setPage(p => Math.max(1, p - 1))}
                                 disabled={page === 1}
                                 className="p-1 rounded border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition-colors"
@@ -702,20 +700,19 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
                                     p = page - 2 + i;
                                 }
                                 return (
-                                    <button 
-                                        key={p} 
+                                    <button
+                                        key={p}
                                         onClick={() => setPage(p)}
-                                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded text-[10px] sm:text-xs font-medium ${
-                                            page === p 
-                                                ? "bg-blue-600 text-white" 
+                                        className={`w-7 h-7 sm:w-8 sm:h-8 rounded text-[10px] sm:text-xs font-medium ${page === p
+                                                ? "bg-blue-600 text-white"
                                                 : "border border-gray-200 text-gray-600 hover:bg-gray-50"
-                                        }`}
+                                            }`}
                                     >
                                         {p}
                                     </button>
                                 );
                             })}
-                            <button 
+                            <button
                                 onClick={() => setPage(p => Math.min(totalPages || 1, p + 1))}
                                 disabled={page === totalPages || totalPages === 0}
                                 className="p-1 rounded border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition-colors"
@@ -771,9 +768,9 @@ const TransactionDetails = ({ txn, onBack }) => {
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
         const date = new Date(dateString);
-        return date.toLocaleDateString('en-IN', { 
-            day: '2-digit', 
-            month: 'short', 
+        return date.toLocaleDateString('en-IN', {
+            day: '2-digit',
+            month: 'short',
             year: 'numeric'
         });
     };
@@ -781,8 +778,8 @@ const TransactionDetails = ({ txn, onBack }) => {
     const formatTime = (dateString) => {
         if (!dateString) return 'N/A';
         const date = new Date(dateString);
-        return date.toLocaleTimeString('en-IN', { 
-            hour: '2-digit', 
+        return date.toLocaleTimeString('en-IN', {
+            hour: '2-digit',
             minute: '2-digit',
             second: '2-digit',
             hour12: true
@@ -803,32 +800,32 @@ const TransactionDetails = ({ txn, onBack }) => {
     // ─── Download Receipt PDF ──────────────────────────────────────────
     const downloadReceipt = async () => {
         setDownloadingReceipt(true);
-        
+
         try {
             const doc = new jsPDF('portrait', 'mm', 'a4');
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
             const margin = 15;
-            
+
             // ─── Receipt Header ────────────────────────────────────────
             // Company Logo/Name
             doc.setFontSize(24);
             doc.setTextColor(30, 58, 138);
             doc.setFont('helvetica', 'bold');
             doc.text('Payment Receipt', pageWidth / 2, 25, { align: 'center' });
-            
+
             // Divider
             doc.setDrawColor(59, 130, 246);
             doc.setLineWidth(0.5);
             doc.line(margin, 30, pageWidth - margin, 30);
-            
+
             // Receipt Number
             doc.setFontSize(10);
             doc.setTextColor(80, 80, 80);
             doc.setFont('helvetica', 'normal');
             doc.text(`Receipt #: ${txn.trx_id || txn.id || 'N/A'}`, margin, 40);
             doc.text(`Date: ${formatDate(txn.created_at)} ${formatTime(txn.created_at)}`, pageWidth - margin - 50, 40);
-            
+
             // ─── Status Badge ──────────────────────────────────────────
             const statusColor = {
                 success: [16, 185, 129],
@@ -837,7 +834,7 @@ const TransactionDetails = ({ txn, onBack }) => {
                 initiated: [234, 179, 8],
                 returned: [249, 115, 22]
             };
-            
+
             const statusBgColor = {
                 success: [236, 253, 245],
                 failed: [254, 242, 242],
@@ -845,56 +842,56 @@ const TransactionDetails = ({ txn, onBack }) => {
                 initiated: [254, 252, 232],
                 returned: [255, 247, 237]
             };
-            
+
             const statusKey = txn.status?.toLowerCase() || '';
             const color = statusColor[statusKey] || [100, 100, 100];
             const bgColor = statusBgColor[statusKey] || [240, 240, 240];
-            
+
             doc.setFillColor(bgColor[0], bgColor[1], bgColor[2]);
             doc.setDrawColor(color[0], color[1], color[2]);
             doc.setFontSize(10);
             doc.setTextColor(color[0], color[1], color[2]);
             doc.setFont('helvetica', 'bold');
-            
-          
-            
+
+
+
             // ─── Amount Section ────────────────────────────────────────
             let yPos = 55;
-            
+
             // Amount Box
             doc.setFillColor(239, 246, 255);
             doc.setDrawColor(59, 130, 246);
             doc.roundedRect(margin, yPos, pageWidth - (margin * 2), 30, 3, 3, 'FD');
-            
+
             doc.setFontSize(11);
             doc.setTextColor(80, 80, 80);
             doc.setFont('helvetica', 'normal');
             doc.text('Transaction Amount', margin + 5, yPos + 8);
-            
+
             doc.setFontSize(20);
             doc.setTextColor(30, 58, 138);
             doc.setFont('helvetica', 'bold');
             doc.text(formatCurrency(txn.amount), margin + 5, yPos + 24);
-            
+
             // ─── Transaction Details ──────────────────────────────────
             yPos += 45;
-            
+
             // Section Title
             doc.setFontSize(12);
             doc.setTextColor(30, 58, 138);
             doc.setFont('helvetica', 'bold');
             doc.text('Transaction Details', margin, yPos);
             yPos += 6;
-            
+
             doc.setDrawColor(200, 200, 200);
             doc.setLineWidth(0.3);
             doc.line(margin, yPos, pageWidth - margin, yPos);
             yPos += 8;
-            
+
             // Details in two columns
             const col1 = margin;
             const col2 = pageWidth / 2 + 10;
-            
+
             const details = [
                 ['Transaction ID', txn.trx_id || txn.id || 'N/A'],
                 ['Order ID', txn.order_id || 'N/A'],
@@ -905,19 +902,19 @@ const TransactionDetails = ({ txn, onBack }) => {
                 ['Source IP', txn.source_ip || 'N/A'],
                 ['Created At', `${formatDate(txn.created_at)} ${formatTime(txn.created_at)}`]
             ];
-            
+
             doc.setFontSize(9);
             doc.setTextColor(80, 80, 80);
             doc.setFont('helvetica', 'normal');
-            
+
             details.forEach(([label, value], index) => {
                 const x = index < 4 ? col1 : col2;
                 const y = yPos + (index % 4) * 7;
-                
+
                 doc.setTextColor(100, 100, 100);
                 doc.setFont('helvetica', 'bold');
                 doc.text(label + ':', x, y);
-                
+
                 doc.setTextColor(30, 30, 30);
                 doc.setFont('helvetica', 'normal');
                 const valueX = x + 35;
@@ -925,21 +922,21 @@ const TransactionDetails = ({ txn, onBack }) => {
                 const wrappedValue = doc.splitTextToSize(value || '–', maxWidth);
                 doc.text(wrappedValue, valueX, y);
             });
-            
+
             yPos += 32;
-            
+
             // ─── Beneficiary Details ──────────────────────────────────
             doc.setFontSize(12);
             doc.setTextColor(30, 58, 138);
             doc.setFont('helvetica', 'bold');
             doc.text('Beneficiary Information', margin, yPos);
             yPos += 6;
-            
+
             doc.setDrawColor(200, 200, 200);
             doc.setLineWidth(0.3);
             doc.line(margin, yPos, pageWidth - margin, yPos);
             yPos += 8;
-            
+
             const beneficiaryDetails = [
                 ['Name', txn.bene_name || 'N/A'],
                 ['Account Number', txn.account_number || 'N/A'],
@@ -948,78 +945,78 @@ const TransactionDetails = ({ txn, onBack }) => {
                 ['Phone', txn.phone || 'N/A'],
                 ['Email', txn.email || 'N/A']
             ];
-            
+
             doc.setFontSize(9);
             doc.setTextColor(80, 80, 80);
-            
+
             beneficiaryDetails.forEach(([label, value], index) => {
                 const x = margin;
                 const y = yPos + index * 7;
-                
+
                 doc.setTextColor(100, 100, 100);
                 doc.setFont('helvetica', 'bold');
                 doc.text(label + ':', x, y);
-                
+
                 doc.setTextColor(30, 30, 30);
                 doc.setFont('helvetica', 'normal');
                 const valueX = x + 35;
                 const wrappedValue = doc.splitTextToSize(value || '–', 80);
                 doc.text(wrappedValue, valueX, y);
             });
-            
+
             // ─── Charges Section ──────────────────────────────────────
             yPos += 48;
-            
+
             doc.setFontSize(12);
             doc.setTextColor(30, 58, 138);
             doc.setFont('helvetica', 'bold');
             doc.text('Charges Summary', margin, yPos);
             yPos += 6;
-            
+
             doc.setDrawColor(200, 200, 200);
             doc.setLineWidth(0.3);
             doc.line(margin, yPos, pageWidth - margin, yPos);
             yPos += 8;
-            
+
             const charges = [
                 ['Charges', formatCurrency(txn.charges || 0)],
                 ['GST', formatCurrency(txn.gst || 0)],
                 ['Total Charges', formatCurrency(txn.total_charges || 0)]
             ];
-            
+
             doc.setFontSize(9);
             charges.forEach(([label, value], index) => {
                 const x = margin;
                 const y = yPos + index * 7;
-                
+
                 doc.setTextColor(100, 100, 100);
                 doc.setFont('helvetica', 'bold');
                 doc.text(label + ':', x, y);
-                
+
                 doc.setTextColor(30, 58, 138);
                 doc.setFont('helvetica', 'bold');
                 const valueX = x + 35;
                 doc.text(value, valueX, y);
             });
-            
+
             // ─── Footer ────────────────────────────────────────────────
             yPos = pageHeight - 25;
-            
+
             doc.setDrawColor(200, 200, 200);
             doc.setLineWidth(0.3);
             doc.line(margin, yPos, pageWidth - margin, yPos);
             yPos += 6;
-            
+
             doc.setFontSize(8);
             doc.setTextColor(150, 150, 150);
             doc.setFont('helvetica', 'normal');
             doc.text('This is a computer-generated receipt. No signature required.', pageWidth / 2, yPos + 3, { align: 'center' });
             doc.text(`Generated on: ${new Date().toLocaleString('en-IN')}`, pageWidth / 2, yPos + 10, { align: 'center' });
-            
+
             // ─── Download PDF ──────────────────────────────────────────
             const fileName = `Receipt_${txn.trx_id || txn.id || 'transaction'}_${new Date().toISOString().split('T')[0]}.pdf`;
             doc.save(fileName);
-            
+
         } catch (err) {
             console.error('Error downloading receipt:', err);
             alert('Failed to download receipt. Please try again.');
@@ -1048,7 +1045,7 @@ const TransactionDetails = ({ txn, onBack }) => {
                         <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M19 12H5M12 19l-7-7 7-7" /></svg>
                         Back
                     </button>
-                    <button 
+                    <button
                         onClick={downloadReceipt}
                         disabled={downloadingReceipt}
                         className={`flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-[11px] sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm ${downloadingReceipt ? 'opacity-50 cursor-not-allowed' : ''}`}
@@ -1106,11 +1103,10 @@ const TransactionDetails = ({ txn, onBack }) => {
                         <button
                             key={tab}
                             onClick={() => setActiveTab(tab)}
-                            className={`px-3 sm:px-4 py-2.5 sm:py-3.5 text-[12px] sm:text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${
-                                activeTab === tab 
-                                    ? "text-blue-600 border-blue-600" 
+                            className={`px-3 sm:px-4 py-2.5 sm:py-3.5 text-[12px] sm:text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${activeTab === tab
+                                    ? "text-blue-600 border-blue-600"
                                     : "text-gray-600 border-transparent hover:text-gray-800"
-                            }`}
+                                }`}
                         >
                             {tab}
                         </button>
@@ -1148,7 +1144,7 @@ const TransactionDetails = ({ txn, onBack }) => {
                                 </div>
 
                                 {/* Status Flow */}
-                                <div className="border border-gray-100 rounded-xl p-3 sm:p-4">
+                                {/* <div className="border border-gray-100 rounded-xl p-3 sm:p-4">
                                     <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-3 sm:mb-4">Status Flow</h3>
                                     <div className="grid grid-cols-4 gap-1 sm:gap-2">
                                         {[
@@ -1159,15 +1155,24 @@ const TransactionDetails = ({ txn, onBack }) => {
                                             <StatusStep key={step.label} {...step} />
                                         ))}
                                     </div>
-                                </div>
+                                </div> */}
 
                                 {/* Response Info */}
+
+
                                 <div className="border border-gray-100 rounded-xl p-3 sm:p-4">
                                     <h3 className="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">Response Information</h3>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 sm:gap-x-8">
                                         <div>
                                             <InfoRow label="Status" value={getStatusDisplay(txn.status)} />
-                                            <InfoRow label="API Response" value={txn.api_response || 'N/A'} />
+                                            {txn.api_response && (
+                                                <div className="mt-2">
+                                                    <label className="text-xs text-gray-500">Full API Response</label>
+                                                    <pre className="text-xs bg-gray-50 p-2 rounded mt-1 overflow-x-auto">
+                                                        {JSON.stringify(JSON.parse(txn.api_response), null, 2)}
+                                                    </pre>
+                                                </div>
+                                            )}
                                         </div>
                                         <div>
                                             <InfoRow label="UTR / Ref No." value={txn.utr || '–'} mono />
@@ -1245,8 +1250,8 @@ export default function TransactionScreen() {
         <div className="w-full bg-gray-50">
             {page === "transactions" ? (
                 <>
-                    <TransactionsPage 
-                        onViewDetails={handleViewDetails} 
+                    <TransactionsPage
+                        onViewDetails={handleViewDetails}
                         onExportClick={handleExportClick}
                     />
                     <TransactionExportScreen
