@@ -6,6 +6,8 @@ import { ChevronDown } from "lucide-react";
 import TransactionExportScreen from '../pages/export/TransactionScreenExport';
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
+import resendWebHookService from "../services/ResendWebHookServices"; 
+
 
 // ─── Icons (inline SVG helpers) ────────────────────────────────────────────
 const Icon = ({ d, size = 16, className = "" }) => (
@@ -94,6 +96,7 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
     const [dateRange, setDateRange] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [webhookLoading, setWebhookLoading] = useState(null); 
     const [transactionData, setTransactionData] = useState({
         data: [],
         stats: {
@@ -268,6 +271,25 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
         fetchTransactions();
     };
 
+     // ─── Webhook Handler ─────────────────────────────────────────────────────
+    const handleResendWebhook = async (orderId, transactionId) => {
+        if (!orderId) {
+            alert('Order ID not found for this transaction');
+            return;
+        }
+
+        setWebhookLoading(transactionId);
+        try {
+            await resendWebHookService.resendWebHook(orderId);
+            console.log('✅ Webhook resent successfully for order:', orderId);
+        } catch (error) {
+            console.error('❌ Failed to resend webhook:', error);
+        } finally {
+            setWebhookLoading(null);
+            setOpenMenu(null);
+        }
+    };
+
     // ─── Format helpers ──────────────────────────────────────────────────────
     const formatDate = (dateString) => {
         if (!dateString) return 'N/A';
@@ -329,6 +351,402 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
         onExportClick(filters, transactionData.total || 0);
     };
 
+    // return (
+    //     <div className="p-3 sm:p-0">
+    //         {/* Header */}
+    //         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 sm:mb-5">
+    //             <div>
+    //                 <h1 className="text-lg sm:text-xl font-bold text-gray-900">Transactions</h1>
+    //                 <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-gray-500 mt-0.5 flex-wrap">
+    //                     <span className="hover:text-blue-600 cursor-pointer">Dashboard</span>
+    //                     <svg width={10} height={10} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M9 18l6-6-6-6" /></svg>
+    //                     <span className="text-gray-800">Transactions</span>
+    //                 </div>
+    //             </div>
+    //             <div className="flex items-center gap-2">
+    //                 <button
+    //                     onClick={handleExportClick}
+    //                     className="flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-[11px] sm:text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors shadow-sm"
+    //                 >
+    //                     <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d={icons.download} /></svg>
+    //                     Export
+    //                 </button>
+    //             </div>
+    //         </div>
+
+    //         {/* ─── Filters Bar ─── */}
+    //         <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100 p-3 sm:p-4 mb-3 sm:mb-4">
+    //             <div className="flex flex-wrap gap-2 sm:gap-3 mb-3">
+    //                 <DateRangePicker
+    //                     onDateChange={handleDateChange}
+    //                     placeholder="Select date range"
+    //                 />
+
+    //                 {/* ── Merchant Dropdown ── */}
+    //                 <div className="relative">
+    //                     <button
+    //                         onClick={() => setIsMerchantOpen(!isMerchantOpen)}
+    //                         className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50 min-w-25"
+    //                     >
+    //                         {selectedMerchant ? merchants.find(m => m.merchant_id === selectedMerchant)?.merchant_id || 'Merchant' : 'Merchants'}
+    //                         <ChevronDown size={10} sm:size={11} className={isMerchantOpen ? 'rotate-180' : ''} />
+    //                     </button>
+    //                     {isMerchantOpen && (
+    //                         <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+    //                             <div className="p-2">
+    //                                 <button
+    //                                     onClick={() => handleMerchantSelect("")}
+    //                                     className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 rounded"
+    //                                 >
+    //                                     All Merchants
+    //                                 </button>
+    //                                 {loadingMerchants ? (
+    //                                     <div className="text-center py-2 text-gray-400 text-xs">Loading...</div>
+    //                                 ) : (
+    //                                     merchants.map((merchant) => (
+    //                                         <button
+    //                                             key={merchant.id}
+    //                                             onClick={() => handleMerchantSelect(merchant.merchant_id)}
+    //                                             className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 rounded truncate"
+    //                                         >
+    //                                             {merchant.merchant_id}
+    //                                         </button>
+    //                                     ))
+    //                                 )}
+    //                             </div>
+    //                         </div>
+    //                     )}
+    //                 </div>
+
+    //                 {/* ── API Dropdown ── */}
+    //                 <div className="relative">
+    //                     <button
+    //                         onClick={() => setIsApiOpen(!isApiOpen)}
+    //                         className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50 min-w-20"
+    //                     >
+    //                         {selectedApi || 'APIs'}
+    //                         <ChevronDown size={10} sm:size={11} className={isApiOpen ? 'rotate-180' : ''} />
+    //                     </button>
+    //                     {isApiOpen && (
+    //                         <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-60 overflow-y-auto">
+    //                             <div className="p-2">
+    //                                 <button
+    //                                     onClick={() => handleApiSelect("")}
+    //                                     className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 rounded"
+    //                                 >
+    //                                     All APIs
+    //                                 </button>
+    //                                 {getApiNames().map((apiName) => (
+    //                                     <button
+    //                                         key={apiName}
+    //                                         onClick={() => handleApiSelect(apiName)}
+    //                                         className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 rounded truncate"
+    //                                     >
+    //                                         {apiName}
+    //                                     </button>
+    //                                 ))}
+    //                             </div>
+    //                         </div>
+    //                     )}
+    //                 </div>
+
+    //                 {/* ── Status Dropdown ── */}
+    //                 <div className="relative">
+    //                     <button
+    //                         onClick={() => setIsStatusOpen(!isStatusOpen)}
+    //                         className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50 min-w-20"
+    //                     >
+    //                         {selectedStatus ? getStatusDisplay(selectedStatus) : 'Status'}
+    //                         <ChevronDown size={10} sm:size={11} className={isStatusOpen ? 'rotate-180' : ''} />
+    //                     </button>
+    //                     {isStatusOpen && (
+    //                         <div className="absolute top-full left-0 mt-1 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+    //                             <div className="p-2">
+    //                                 {statusOptions.map((option) => (
+    //                                     <button
+    //                                         key={option.value}
+    //                                         onClick={() => handleStatusSelect(option.value)}
+    //                                         className="w-full text-left px-3 py-1.5 text-xs hover:bg-gray-50 rounded"
+    //                                     >
+    //                                         {option.label}
+    //                                     </button>
+    //                                 ))}
+    //                             </div>
+    //                         </div>
+    //                     )}
+    //                 </div>
+    //             </div>
+
+    //             {/* ─── Search and Action Buttons ─── */}
+    //             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+    //                 <input
+    //                     value={searchTerm}
+    //                     onChange={(e) => setSearchTerm(e.target.value)}
+    //                     className="px-2 sm:px-3 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-[11px] sm:text-xs flex-1 min-w-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 placeholder:text-gray-400"
+    //                     placeholder="Transaction ID / Order ID / UTR / Ref No."
+    //                 />
+    //                 <div className="flex gap-2 ml-auto w-full sm:w-auto mt-2 sm:mt-0">
+    //                     <button
+    //                         onClick={clearFilters}
+    //                         className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 border border-gray-200 rounded-lg text-[11px] sm:text-xs text-gray-700 hover:bg-gray-50 transition-colors"
+    //                     >
+    //                         Reset
+    //                     </button>
+    //                     <button
+    //                         onClick={fetchTransactions}
+    //                         className="flex-1 sm:flex-none px-3 sm:px-4 py-1.5 sm:py-2 border border-blue-300 text-blue-700 rounded-lg text-[11px] sm:text-xs font-medium hover:bg-blue-50 transition-colors"
+    //                     >
+    //                         Apply
+    //                     </button>
+    //                 </div>
+    //             </div>
+
+    //             {/* ─── Active Filters Display ─── */}
+    //             {(selectedMerchant || selectedApi || selectedStatus || dateRange || searchTerm) && (
+    //                 <div className="flex flex-wrap items-center gap-2 mt-3 pt-3 border-t border-gray-100">
+    //                     <span className="text-xs text-gray-500">Active Filters:</span>
+    //                     {dateRange && (
+    //                         <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px]">
+    //                             {dateRange.startFormatted} - {dateRange.endFormatted}
+    //                         </span>
+    //                     )}
+    //                     {selectedMerchant && (
+    //                         <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px]">
+    //                             Merchant: {selectedMerchant}
+    //                         </span>
+    //                     )}
+    //                     {selectedApi && (
+    //                         <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px]">
+    //                             API: {selectedApi}
+    //                         </span>
+    //                     )}
+    //                     {selectedStatus && (
+    //                         <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px]">
+    //                             Status: {getStatusDisplay(selectedStatus)}
+    //                         </span>
+    //                     )}
+    //                     {searchTerm && (
+    //                         <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded-full text-[10px]">
+    //                             Search: {searchTerm}
+    //                         </span>
+    //                     )}
+    //                 </div>
+    //             )}
+    //         </div>
+
+    //         {/* ─── Tabs & Table Container ─── */}
+    //         <div className="bg-white rounded-xl sm:rounded-2xl border border-gray-100">
+    //             <div className="flex border-b border-gray-100 px-2 sm:px-4 pt-2 sm:pt-3 pb-2 sm:pb-3 gap-1 overflow-x-auto hide-scrollbar">
+    //                 {tabs.map((tab) => (
+    //                     <button
+    //                         key={tab.key}
+    //                         onClick={() => { setActiveTab(tab.key); setPage(1); }}
+    //                         className={`flex flex-col items-center px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-lg text-[11px] sm:text-sm font-medium transition-colors whitespace-nowrap border ${activeTab === tab.key
+    //                                 ? "bg-[#ECF2FE] text-blue-600 border-blue-500"
+    //                                 : "text-gray-600 border-gray-100 hover:bg-blue-50"
+    //                             }`}
+    //                     >
+    //                         <span>{tab.label}</span>
+    //                         <span className={`text-[10px] sm:text-xs font-bold mt-0.5 ${activeTab === tab.key ? "text-blue-600" :
+    //                                 tab.key === 'success' ? "text-green-600" :
+    //                                     tab.key === 'failed' ? "text-red-600" :
+    //                                         tab.key === 'returned' ? "text-orange-600" :
+    //                                             tab.key === 'initiated' ? "text-yellow-600" :
+    //                                                 tab.key === 'processing' ? "text-blue-600" :
+    //                                                     "text-gray-600"
+    //                             }`}>
+    //                             {tab.count.toLocaleString()}
+    //                         </span>
+    //                     </button>
+    //                 ))}
+    //             </div>
+
+    //             {/* ─── Loading State ─── */}
+    //             {loading && (
+    //                 <div className="flex items-center justify-center py-12">
+    //                     <div className="text-center">
+    //                         <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600 mx-auto"></div>
+    //                         <p className="mt-3 text-sm text-gray-500">Loading transactions...</p>
+    //                     </div>
+    //                 </div>
+    //             )}
+
+    //             {/* ─── Error State ─── */}
+    //             {error && !loading && (
+    //                 <div className="flex items-center justify-center py-12">
+    //                     <div className="text-center">
+    //                         <svg className="w-12 h-12 text-red-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    //                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    //                         </svg>
+    //                         <p className="mt-3 text-sm text-red-500">{error}</p>
+    //                         <button
+    //                             onClick={handleRefresh}
+    //                             className="mt-3 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm"
+    //                         >
+    //                             Try Again
+    //                         </button>
+    //                     </div>
+    //                 </div>
+    //             )}
+
+    //             {/* ─── Table ─── */}
+    //             {!loading && !error && (
+    //                 <div className="overflow-x-auto">
+    //                     <table className="w-full min-w-250">
+    //                         <thead>
+    //                             <tr className="bg-gray-50 border-b border-gray-100">
+    //                                 <th className="w-10 px-2 sm:px-4 py-2 sm:py-3"><span className="flex items-center text-xs sm:text-sm text-gray-700">#</span></th>
+    //                                 {["Txn ID", "Order ID", "Merchant", "Beneficiary", "Amount", "API Used", "Status", "UTR / Ref No.", "Created At", "Actions"].map((h) => (
+    //                                     <th key={h} className="px-2 sm:px-3 py-2 sm:py-3 text-left text-[10px] sm:text-xs font-semibold text-gray-500 whitespace-nowrap">{h}</th>
+    //                                 ))}
+    //                             </tr>
+    //                         </thead>
+    //                         <tbody>
+    //                             {transactions.length === 0 ? (
+    //                                 <tr>
+    //                                     <td colSpan={11} className="text-center py-12 text-gray-400 text-xs sm:text-sm">
+    //                                         No transactions found
+    //                                     </td>
+    //                                 </tr>
+    //                             ) : (
+    //                                 transactions.map((txn, index) => (
+    //                                     <tr key={txn.id} className="border-b border-gray-50 hover:bg-gray-50/70 transition-colors group">
+    //                                         <td className="px-2 sm:px-4 py-2 sm:py-3">
+    //                                             <span className="flex items-center text-xs sm:text-sm text-gray-700">
+    //                                                 {(transactionData.page - 1) * transactionData.limit + index + 1}
+    //                                             </span>
+    //                                         </td>
+    //                                         <td className="px-2 sm:px-3 py-2 sm:py-3">
+    //                                             <span
+    //                                                 className="text-[10px] sm:text-xs font-mono text-blue-600 whitespace-nowrap cursor-pointer hover:underline"
+    //                                                 onClick={() => onViewDetails(txn)}
+    //                                             >
+    //                                                 {txn.trx_id || txn.id}
+    //                                             </span>
+    //                                         </td>
+    //                                         <td className="px-2 sm:px-3 py-2 sm:py-3 text-[10px] sm:text-xs text-gray-600 font-mono whitespace-nowrap">
+    //                                             {txn.order_id || 'N/A'}
+    //                                         </td>
+    //                                         <td className="px-2 sm:px-3 py-2 sm:py-3 text-[10px] sm:text-xs text-gray-800 font-medium whitespace-nowrap">
+    //                                             {txn.merchant_name || 'N/A'}
+    //                                         </td>
+    //                                         <td className="px-2 sm:px-3 py-2 sm:py-3">
+    //                                             <div className="text-[10px] sm:text-xs font-medium text-gray-800">{txn.bene_name || 'N/A'}</div>
+    //                                             <div className="text-[9px] sm:text-[11px] text-gray-500">{txn.phone || 'N/A'}</div>
+    //                                         </td>
+    //                                         <td className="px-2 sm:px-3 py-2 sm:py-3 text-[10px] sm:text-xs font-semibold text-gray-900 whitespace-nowrap">
+    //                                             {formatCurrency(txn.amount)}
+    //                                         </td>
+    //                                         <td className="px-2 sm:px-3 py-2 sm:py-3 whitespace-nowrap">
+    //                                             <ApiLogo api={txn.api_name || 'N/A'} />
+    //                                         </td>
+    //                                         <td className="px-2 sm:px-3 py-2 sm:py-3">
+    //                                             <StatusBadge status={txn.status} />
+    //                                         </td>
+    //                                         <td className="px-2 sm:px-3 py-2 sm:py-3 text-[10px] sm:text-xs text-gray-600 font-mono whitespace-nowrap">
+    //                                             {txn.utr || '–'}
+    //                                         </td>
+    //                                         <td className="px-2 sm:px-3 py-2 sm:py-3">
+    //                                             <div className="text-[10px] sm:text-xs text-gray-800">{formatDate(txn.created_at)}</div>
+    //                                             <div className="text-[9px] sm:text-[11px] text-gray-500">{formatTime(txn.created_at)}</div>
+    //                                         </td>
+    //                                         <td className="px-2 sm:px-3 py-2 sm:py-3 relative">
+    //                                             <button
+    //                                                 onClick={() => setOpenMenu(openMenu === txn.id ? null : txn.id)}
+    //                                                 className="p-1 rounded-lg hover:bg-gray-200 text-gray-500 transition-colors"
+    //                                             >
+    //                                                 <svg width={14} height={14} viewBox="0 0 24 24" fill="currentColor">
+    //                                                     <circle cx="12" cy="5" r="1.5" />
+    //                                                     <circle cx="12" cy="12" r="1.5" />
+    //                                                     <circle cx="12" cy="19" r="1.5" />
+    //                                                 </svg>
+    //                                             </button>
+    //                                             {openMenu === txn.id && (
+    //                                                 <div className="absolute right-0 top-8 z-50 bg-white rounded-xl shadow-xl border border-gray-100 py-1 w-44">
+    //                                                     <button
+    //                                                         onClick={() => { onViewDetails(txn); setOpenMenu(null); }}
+    //                                                         className="flex items-center gap-2 w-full px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+    //                                                     >
+    //                                                         <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+    //                                                             <path d={icons.eye} />
+    //                                                         </svg>
+    //                                                         View Details
+    //                                                     </button>
+    //                                                 </div>
+    //                                             )}
+    //                                         </td>
+    //                                     </tr>
+    //                                 ))
+    //                             )}
+    //                         </tbody>
+    //                     </table>
+    //                 </div>
+    //             )}
+
+    //             {/* ─── Pagination ─── */}
+    //             {!loading && !error && transactions.length > 0 && (
+    //                 <div className="flex flex-col sm:flex-row items-center justify-between gap-3 px-3 sm:px-4 py-3 border-t border-gray-100">
+    //                     <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-600">
+    //                         <span>Rows per page:</span>
+    //                         <select
+    //                             value={limit}
+    //                             onChange={(e) => { setLimit(parseInt(e.target.value)); setPage(1); }}
+    //                             className="border border-gray-200 rounded px-2 py-1 text-xs sm:text-sm"
+    //                         >
+    //                             <option value={5}>5</option>
+    //                             <option value={10}>10</option>
+    //                             <option value={25}>25</option>
+    //                             <option value={50}>50</option>
+    //                         </select>
+    //                     </div>
+    //                     <span className="text-[10px] sm:text-xs text-gray-500 text-center">
+    //                         Showing {(transactionData.page - 1) * transactionData.limit + 1} to {Math.min(transactionData.page * transactionData.limit, totalItems)} of {totalItems} transactions
+    //                     </span>
+    //                     <div className="flex items-center gap-1">
+    //                         <button
+    //                             onClick={() => setPage(p => Math.max(1, p - 1))}
+    //                             disabled={page === 1}
+    //                             className="p-1 rounded border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition-colors"
+    //                         >
+    //                             <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M15 18l-6-6 6-6" /></svg>
+    //                         </button>
+    //                         {Array.from({ length: Math.min(totalPages || 1, 5) }, (_, i) => {
+    //                             let p;
+    //                             if (totalPages <= 5) {
+    //                                 p = i + 1;
+    //                             } else if (page <= 3) {
+    //                                 p = i + 1;
+    //                             } else if (page >= totalPages - 2) {
+    //                                 p = totalPages - 4 + i;
+    //                             } else {
+    //                                 p = page - 2 + i;
+    //                             }
+    //                             return (
+    //                                 <button
+    //                                     key={p}
+    //                                     onClick={() => setPage(p)}
+    //                                     className={`w-7 h-7 sm:w-8 sm:h-8 rounded text-[10px] sm:text-xs font-medium ${page === p
+    //                                             ? "bg-blue-600 text-white"
+    //                                             : "border border-gray-200 text-gray-600 hover:bg-gray-50"
+    //                                         }`}
+    //                                 >
+    //                                     {p}
+    //                                 </button>
+    //                             );
+    //                         })}
+    //                         <button
+    //                             onClick={() => setPage(p => Math.min(totalPages || 1, p + 1))}
+    //                             disabled={page === totalPages || totalPages === 0}
+    //                             className="p-1 rounded border border-gray-200 text-gray-500 hover:bg-gray-50 disabled:opacity-40 transition-colors"
+    //                         >
+    //                             <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><path d="M9 18l6-6-6-6" /></svg>
+    //                         </button>
+    //                     </div>
+    //                 </div>
+    //             )}
+    //         </div>
+    //     </div>
+    // );
     return (
         <div className="p-3 sm:p-0">
             {/* Header */}
@@ -649,6 +1067,26 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
                                                                 <path d={icons.eye} />
                                                             </svg>
                                                             View Details
+                                                        </button>
+                                                        
+                                                        {/* ─── Webhook Button ─── */}
+                                                        <button
+                                                            onClick={() => {
+                                                                const orderId = txn.order_id;
+                                                                handleResendWebhook(orderId, txn.id);
+                                                            }}
+                                                            disabled={webhookLoading === txn.id}
+                                                            className="flex items-center gap-2 w-full px-3 py-2 text-xs sm:text-sm text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+                                                        >
+                                                            {webhookLoading === txn.id ? (
+                                                                <span className="inline-block w-3 h-3 border-2 border-gray-500 border-t-transparent rounded-full animate-spin" />
+                                                            ) : (
+                                                                <svg width={12} height={12} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                                                                    <path d="M4 4v16h16" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+                                                                    <path d="M8 12l3 3 8-8" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"/>
+                                                                </svg>
+                                                            )}
+                                                            {webhookLoading === txn.id ? 'Sending...' : 'Resend Webhook'}
                                                         </button>
                                                     </div>
                                                 )}
