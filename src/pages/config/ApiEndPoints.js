@@ -36,7 +36,7 @@ const API_ENDPOINTS = {
     filter: 'transactions/filter',
     retry: 'transactions/retry',
     return: 'transactions/return',
-    resendWebHook:'merchant/resend-webhook',
+    resendWebHook:'merchant/resend-webhook'
   },
 
   reports: {
