@@ -15,10 +15,11 @@ const API_ENDPOINTS = {
   changePass: "admin/change-password",
 
   merchants: {
-    list: 'admin/merchants',
+    list: 'admin/merchants', 
     details: 'admin/merchants/',
     create: 'admin/merchants',
     update: 'admin/merchants',
+    addWallet: 'admin/merchants/add-wallet',
 
   },
   payoutApis: {

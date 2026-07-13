@@ -172,7 +172,7 @@ const merchantService = {
             throw error;
         }
     },
-
+ 
       /**
      * Update merchant
      * @param {string|number} id - Merchant ID
@@ -279,6 +279,39 @@ const merchantService = {
             throw error;
         }
     },
+
+    /**
+     * Add money to merchant wallet
+     * @param {Object} data - Wallet funding data
+     * @param {number} data.merchant_id - Merchant ID
+     * @param {number} data.amount - Amount to add
+     * @param {string} data.remark - Remark for the transaction
+     * @returns {Promise} - API response
+     */
+    async addWalletMoney(data) {
+        try {
+            console.log('💰 Adding wallet money:', data);
+            
+            // Validate required fields
+            if (!data.merchant_id) {
+                throw new Error('Merchant ID is required');
+            }
+            if (!data.amount || data.amount <= 0) {
+                throw new Error('Valid amount is required');
+            }
+            if (!data.remark) {
+                throw new Error('Remark is required');
+            }
+
+            const response = await api.post(API_ENDPOINTS.merchants.addWallet, data);
+            console.log('✅ Wallet money added:', response.data);
+            return response.data;
+        } catch (error) {
+            console.error('❌ Error adding wallet money:', error);
+            throw error;
+        }
+    },
+
 };
 
 export default merchantService;
