@@ -182,9 +182,9 @@ function VolumeChart({ data }) {
                                 tickFormatter={v => `${(v / 1000000).toFixed(0)}M`}
                                 width={35}
                             />
-                            <Tooltip 
-                                formatter={v => `₹ ${(v / 100000).toFixed(1)}L`} 
-                                contentStyle={{ fontSize: 11 }} 
+                            <Tooltip
+                                formatter={v => `₹ ${(v / 100000).toFixed(1)}L`}
+                                contentStyle={{ fontSize: 11 }}
                             />
                             <Area type="monotone" dataKey="amt" stroke="#3b82f6" strokeWidth={2} fill="url(#blueGrad)" dot={{ r: 2.5, fill: "#3b82f6" }} activeDot={{ r: 4 }} />
                         </AreaChart>
@@ -296,10 +296,10 @@ function ApiSuccessRates({ data }) {
             <div className="space-y-3 sm:space-y-4">
                 {data && data.length > 0 ? (
                     data.map((item) => (
-                        <ApiRateBar 
-                            key={item.api_name} 
-                            name={item.api_name} 
-                            rate={parseFloat(item.success_rate).toFixed(2)} 
+                        <ApiRateBar
+                            key={item.api_name}
+                            name={item.api_name}
+                            rate={parseFloat(item.success_rate).toFixed(2)}
                             color={getSuccessRateColor(item.success_rate)}
                         />
                     ))
@@ -328,8 +328,8 @@ function TopApisTable({ data }) {
                         </thead>
                         <tbody>
                             {data.map((api) => (
-                                <ApiRow 
-                                    key={api.id} 
+                                <ApiRow
+                                    key={api.id}
                                     name={api.api_name}
                                     rate={parseFloat(api.success_rate).toFixed(2)}
                                     vol={api.total_transactions}
@@ -364,7 +364,7 @@ function RecentTransactionsTable({ data }) {
                         </thead>
                         <tbody>
                             {data.map((txn) => (
-                                <TransactionRow 
+                                <TransactionRow
                                     key={txn.id}
                                     id={txn.trx_id || txn.order_id}
                                     merchant={txn.merchant_name}
@@ -430,56 +430,63 @@ function DashboardPage() {
     // };
 
     // Helper function to format date as DD-M-YYYY
-const formatDateForApi = (dateStr) => {
-    if (!dateStr) return '';
-    
-    // Parse the date string (assuming format like "Jul 24, 2026")
-    const date = new Date(dateStr);
-    if (isNaN(date.getTime())) {
-        // If parsing fails, try to extract from string
-        const parts = dateStr.replace(/,/g, '').split(' ');
-        if (parts.length >= 3) {
-            const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
-                               'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            const monthIndex = monthNames.indexOf(parts[0]);
-            const day = parts[1];
-            const year = parts[2];
-            
-            // Return as DD-M-YYYY (remove leading zero from day if present)
-            const dayNum = parseInt(day);
-            const monthNum = monthIndex + 1;
-            return `${dayNum}-${monthNum}-${year}`;
+    const formatDateForApi = (dateStr) => {
+        if (!dateStr) return '';
+
+        try {
+            // Try to parse as Date object first
+            const date = new Date(dateStr);
+            if (!isNaN(date.getTime())) {
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                const day = String(date.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
+
+            // If Date parsing fails, parse the string (format: "Jul 24, 2026")
+            const cleaned = dateStr.replace(/,/g, '').trim();
+            const parts = cleaned.split(' ');
+
+            if (parts.length === 3) {
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const monthIndex = monthNames.indexOf(parts[0]);
+                if (monthIndex !== -1) {
+                    const day = String(parseInt(parts[1])).padStart(2, '0');
+                    const year = parts[2];
+                    const month = String(monthIndex + 1).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+            }
+
+            // If all else fails, return original
+            return dateStr;
+        } catch (e) {
+            console.warn('Date formatting error:', e);
+            return dateStr;
         }
-        return dateStr;
-    }
-    
-    const day = date.getDate();
-    const month = date.getMonth() + 1;
-    const year = date.getFullYear();
-    
-    return `${day}-${month}-${year}`;
-};
+    };
 
     const fetchDashboardData = async (dateData = null) => {
-    setLoading(true);
-    setError(null);
-    try {
-        let params = {};
-        if (dateData) {
-            params = {
-                from_date: formatDateForApi(dateData.startFormatted),
-                to_date: formatDateForApi(dateData.endFormatted)
-            };
+        setLoading(true);
+        setError(null);
+        try {
+            let params = {};
+            if (dateData) {
+                params = {
+                    from_date: formatDateForApi(dateData.startFormatted),
+                    to_date: formatDateForApi(dateData.endFormatted)
+                };
+            }
+            const response = await dashboardService.getDashboardData(params);
+            setDashboardData(response);
+        } catch (err) {
+            console.error('Error fetching dashboard data:', err);
+            setError('Failed to load dashboard data. Please try again.');
+        } finally {
+            setLoading(false);
         }
-        const response = await dashboardService.getDashboardData(params);
-        setDashboardData(response);
-    } catch (err) {
-        console.error('Error fetching dashboard data:', err);
-        setError('Failed to load dashboard data. Please try again.');
-    } finally {
-        setLoading(false);
-    }
-};
+    };
     const handleRefresh = () => {
         fetchDashboardData(dateRange);
     };
@@ -507,7 +514,7 @@ const formatDateForApi = (dateStr) => {
                 <div className="text-center">
                     <AlertTriangle className="h-12 w-12 text-red-500 mx-auto" />
                     <p className="mt-4 text-red-600">{error}</p>
-                    <button 
+                    <button
                         onClick={handleRefresh}
                         className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
                     >
@@ -528,105 +535,105 @@ const formatDateForApi = (dateStr) => {
 
     // Prepare top cards data from API
     const topCards = [
-        { 
-            label: "Total Withdrawal Requests", 
-            value: summary.total_withdrawal_requests?.toLocaleString() || '0', 
-            change: null, 
-            up: null, 
-            bg: "bg-blue-50", 
-            iconBg: "bg-blue-100", 
-            iconColor: "text-blue-500", 
-            Icon: CreditCard, 
-            borderColor: "border-blue-200", 
-            textColor: "text-blue-700" 
+        {
+            label: "Total Withdrawal Requests",
+            value: summary.total_withdrawal_requests?.toLocaleString() || '0',
+            change: null,
+            up: null,
+            bg: "bg-blue-50",
+            iconBg: "bg-blue-100",
+            iconColor: "text-blue-500",
+            Icon: CreditCard,
+            borderColor: "border-blue-200",
+            textColor: "text-blue-700"
         },
-        { 
-            label: "Successful Payouts", 
-            value: summary.successful_payouts?.toLocaleString() || '0', 
-            change: null, 
-            up: null, 
-            bg: "bg-green-50", 
-            iconBg: "bg-green-100", 
-            iconColor: "text-green-500", 
-            Icon: CheckCircle, 
-            borderColor: "border-green-200", 
-            textColor: "text-green-700" 
+        {
+            label: "Successful Payouts",
+            value: summary.successful_payouts?.toLocaleString() || '0',
+            change: null,
+            up: null,
+            bg: "bg-green-50",
+            iconBg: "bg-green-100",
+            iconColor: "text-green-500",
+            Icon: CheckCircle,
+            borderColor: "border-green-200",
+            textColor: "text-green-700"
         },
-        { 
-            label: "Failed Payouts", 
-            value: summary.failed_payouts?.toLocaleString() || '0', 
-            change: null, 
-            up: null, 
-            bg: "bg-red-50", 
-            iconBg: "bg-red-100", 
-            iconColor: "text-red-500", 
-            Icon: XCircle, 
-            borderColor: "border-red-200", 
-            textColor: "text-red-700" 
+        {
+            label: "Failed Payouts",
+            value: summary.failed_payouts?.toLocaleString() || '0',
+            change: null,
+            up: null,
+            bg: "bg-red-50",
+            iconBg: "bg-red-100",
+            iconColor: "text-red-500",
+            Icon: XCircle,
+            borderColor: "border-red-200",
+            textColor: "text-red-700"
         },
-        { 
-            label: "Returned to SGPay", 
-            value: payoutStatus.find(p => p.status === 'returned')?.count?.toLocaleString() || '0', 
-            change: null, 
-            up: null, 
-            bg: "bg-orange-50", 
-            iconBg: "bg-orange-100", 
-            iconColor: "text-orange-500", 
-            Icon: RotateCcw, 
-            borderColor: "border-orange-200", 
-            textColor: "text-orange-700" 
+        {
+            label: "Returned to SGPay",
+            value: payoutStatus.find(p => p.status === 'returned')?.count?.toLocaleString() || '0',
+            change: null,
+            up: null,
+            bg: "bg-orange-50",
+            iconBg: "bg-orange-100",
+            iconColor: "text-orange-500",
+            Icon: RotateCcw,
+            borderColor: "border-orange-200",
+            textColor: "text-orange-700"
         },
     ];
 
     // Prepare bottom cards data from API
     const bottomCards = [
-        { 
-            label: "Total Transaction Amount", 
-            value: `₹ ${formatCurrency(summary.total_transaction_amount)}`, 
-            change: null, 
-            up: null, 
-            bg: "bg-purple-50", 
-            iconBg: "bg-purple-100", 
-            iconColor: "text-purple-500", 
-            Icon: Wallet, 
-            borderColor: "border-purple-200", 
-            textColor: "text-purple-700" 
+        {
+            label: "Total Transaction Amount",
+            value: `₹ ${formatCurrency(summary.total_transaction_amount)}`,
+            change: null,
+            up: null,
+            bg: "bg-purple-50",
+            iconBg: "bg-purple-100",
+            iconColor: "text-purple-500",
+            Icon: Wallet,
+            borderColor: "border-purple-200",
+            textColor: "text-purple-700"
         },
-        { 
-            label: "Today's Processing Volume", 
-            value: `₹ ${formatCurrency(summary.today_processing_volume)}`, 
-            change: null, 
-            up: null, 
-            bg: "bg-blue-50", 
-            iconBg: "bg-blue-100", 
-            iconColor: "text-blue-500", 
-            Icon: BarChart2, 
-            borderColor: "border-blue-200", 
-            textColor: "text-blue-700" 
+        {
+            label: "Today's Processing Volume",
+            value: `₹ ${formatCurrency(summary.today_processing_volume)}`,
+            change: null,
+            up: null,
+            bg: "bg-blue-50",
+            iconBg: "bg-blue-100",
+            iconColor: "text-blue-500",
+            Icon: BarChart2,
+            borderColor: "border-blue-200",
+            textColor: "text-blue-700"
         },
-        { 
-            label: "Active APIs", 
-            value: `${summary.active_apis || 0} / ${(summary.active_apis || 0) + (summary.inactive_apis || 0)}`, 
-            change: `${summary.active_apis || 0} Active`, 
-            up: null, 
-            iconBg: "bg-yellow-100", 
-            bg: "bg-yellow-50", 
-            iconColor: "text-yellow-500", 
-            Icon: Layers, 
-            borderColor: "border-yellow-200", 
-            textColor: "text-yellow-700" 
+        {
+            label: "Active APIs",
+            value: `${summary.active_apis || 0} / ${(summary.active_apis || 0) + (summary.inactive_apis || 0)}`,
+            change: `${summary.active_apis || 0} Active`,
+            up: null,
+            iconBg: "bg-yellow-100",
+            bg: "bg-yellow-50",
+            iconColor: "text-yellow-500",
+            Icon: Layers,
+            borderColor: "border-yellow-200",
+            textColor: "text-yellow-700"
         },
-        { 
-            label: "Active Merchants", 
-            value: summary.active_merchants?.toLocaleString() || '0', 
-            change: null, 
-            up: null, 
-            bg: "bg-teal-50", 
-            iconBg: "bg-teal-100", 
-            iconColor: "text-teal-500", 
-            Icon: UserCheck, 
-            borderColor: "border-teal-200", 
-            textColor: "text-teal-700" 
+        {
+            label: "Active Merchants",
+            value: summary.active_merchants?.toLocaleString() || '0',
+            change: null,
+            up: null,
+            bg: "bg-teal-50",
+            iconBg: "bg-teal-100",
+            iconColor: "text-teal-500",
+            Icon: UserCheck,
+            borderColor: "border-teal-200",
+            textColor: "text-teal-700"
         },
     ];
 
@@ -642,11 +649,11 @@ const formatDateForApi = (dateStr) => {
                     <p className="text-[11px] sm:text-xs text-gray-800 mt-0.5">Welcome back, Super Admin! Here's what's happening today.</p>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-2">
-                    <DateRangePicker 
+                    <DateRangePicker
                         onDateChange={handleDateChange}
                         placeholder="Select date range"
                     />
-                    <button 
+                    <button
                         onClick={handleRefresh}
                         className="flex items-center justify-center gap-1.5 sm:gap-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold"
                     >
@@ -662,7 +669,7 @@ const formatDateForApi = (dateStr) => {
                     <span className="text-xs text-blue-700 font-medium">
                         Showing data for: <span className="font-bold">{selectedDateDisplay}</span>
                     </span>
-                    <button 
+                    <button
                         onClick={() => {
                             setSelectedDateDisplay("");
                             setDateRange(null);
