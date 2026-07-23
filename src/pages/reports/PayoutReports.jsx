@@ -64,14 +64,14 @@ export default function PayoutReport() {
   const [dateRange, setDateRange] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  
+
   // ─── Filter States ───
   const [selectedMerchant, setSelectedMerchant] = useState("");
   const [selectedApi, setSelectedApi] = useState("");
   const [selectedStatus, setSelectedStatus] = useState("");
   const [merchants, setMerchants] = useState([]);
   const [loadingMerchants, setLoadingMerchants] = useState(false);
-  
+
   // ─── Dropdown Open States ───
   const [isMerchantOpen, setIsMerchantOpen] = useState(false);
   const [isApiOpen, setIsApiOpen] = useState(false);
@@ -109,6 +109,44 @@ export default function PayoutReport() {
     { value: "returned", label: "Returned" },
   ];
 
+  // ─── Helper function to format date as DD-M-YYYY ──────────────────────────
+  const formatDateForApi = (dateStr) => {
+    if (!dateStr) return '';
+
+    try {
+      // Try to parse as Date object first
+      const date = new Date(dateStr);
+      if (!isNaN(date.getTime())) {
+        const day = date.getDate();
+        const month = date.getMonth() + 1;
+        const year = date.getFullYear();
+        return `${day}-${month}-${year}`;
+      }
+
+      // If Date parsing fails, parse the string (format: "Jul 24, 2026")
+      const cleaned = dateStr.replace(/,/g, '').trim();
+      const parts = cleaned.split(' ');
+
+      if (parts.length === 3) {
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const monthIndex = monthNames.indexOf(parts[0]);
+        if (monthIndex !== -1) {
+          const day = parseInt(parts[1]);
+          const year = parts[2];
+          const month = monthIndex + 1;
+          return `${day}-${month}-${year}`;
+        }
+      }
+
+      // If all else fails, return original
+      return dateStr;
+    } catch (e) {
+      console.warn('Date formatting error:', e);
+      return dateStr;
+    }
+  };
+
   // ─── Fetch Merchants ───
   const fetchMerchants = async () => {
     setLoadingMerchants(true);
@@ -124,39 +162,82 @@ export default function PayoutReport() {
     }
   };
 
+ 
+
   useEffect(() => {
     fetchMerchants();
   }, []);
 
   // ─── Fetch Report Data ──────────────────────────────────────────────────────
+  // const fetchReportData = async () => {
+  //   setLoading(true);
+  //   setError(null);
+
+  //   try {
+  //     const params = {};
+
+  //     // Date range
+  //     if (dateRange) {
+  //       params.from_date = dateRange.startFormatted;
+  //       params.to_date = dateRange.endFormatted;
+  //     }
+
+  //     // Merchant filter
+  //     if (selectedMerchant) {
+  //       params.merchant_id = selectedMerchant;
+  //     }
+
+  //     // API filter
+  //     if (selectedApi) {
+  //       params.api_used = selectedApi;
+  //     }
+
+  //     // Status filter
+  //     if (selectedStatus) {
+  //       params.status = selectedStatus;
+  //     }
+
+  //     const response = await payoutReportService.getPayoutReport(params);
+  //     setReportData(response);
+  //   } catch (err) {
+  //     console.error('Error fetching payout report:', err);
+  //     setError('Failed to load payout report. Please try again.');
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+   // ─── Fetch Report Data ──────────────────────────────────────────────────────
   const fetchReportData = async () => {
     setLoading(true);
     setError(null);
-    
+
     try {
       const params = {};
-      
-      // Date range
+
+      // Date range - ✅ Format dates as DD-M-YYYY
       if (dateRange) {
-        params.from_date = dateRange.startFormatted;
-        params.to_date = dateRange.endFormatted;
+        params.from_date = formatDateForApi(dateRange.startFormatted);
+        params.to_date = formatDateForApi(dateRange.endFormatted);
       }
-      
+
       // Merchant filter
       if (selectedMerchant) {
         params.merchant_id = selectedMerchant;
       }
-      
+
       // API filter
       if (selectedApi) {
         params.api_used = selectedApi;
       }
-      
+
       // Status filter
       if (selectedStatus) {
         params.status = selectedStatus;
       }
-      
+
+      console.log('📊 Fetching payout report with params:', params); // Debug
+
       const response = await payoutReportService.getPayoutReport(params);
       setReportData(response);
     } catch (err) {
@@ -260,8 +341,8 @@ export default function PayoutReport() {
     name: item.api_name || 'Unknown',
     value: parseInt(item.total_transactions) || 0,
     pct: `${parseFloat(item.success_rate || 0).toFixed(2)}%`,
-    color: parseFloat(item.success_rate) >= 80 ? '#16a34a' : 
-           parseFloat(item.success_rate) >= 50 ? '#f59e0b' : '#ef4444'
+    color: parseFloat(item.success_rate) >= 80 ? '#16a34a' :
+      parseFloat(item.success_rate) >= 50 ? '#f59e0b' : '#ef4444'
   }));
 
   // Prepare merchant table data
@@ -296,129 +377,129 @@ export default function PayoutReport() {
 
   // Top stat cards from API
   const topStatCards = [
-    { 
-      label: "Total Payouts", 
-      value: formatNumber(summary.total_payout_count), 
-      change: null, 
-      up: true, 
-      sub: "All time", 
-      Icon: Send, 
-      iconBg: "bg-purple-100", 
-      iconColor: "text-purple-600" 
+    {
+      label: "Total Payouts",
+      value: formatNumber(summary.total_payout_count),
+      change: null,
+      up: true,
+      sub: "All time",
+      Icon: Send,
+      iconBg: "bg-purple-100",
+      iconColor: "text-purple-600"
     },
-    { 
-      label: "Total Payout Amount", 
-      value: formatCurrency(summary.total_payout_amount), 
-      change: null, 
-      up: true, 
-      sub: "All time", 
-      Icon: IndianRupee, 
-      iconBg: "bg-blue-100", 
-      iconColor: "text-blue-600" 
+    {
+      label: "Total Payout Amount",
+      value: formatCurrency(summary.total_payout_amount),
+      change: null,
+      up: true,
+      sub: "All time",
+      Icon: IndianRupee,
+      iconBg: "bg-blue-100",
+      iconColor: "text-blue-600"
     },
-    { 
-      label: "Successful Payouts", 
-      value: formatNumber(summary.successful_payouts), 
-      change: null, 
-      up: true, 
-      sub: `₹${formatCurrency(summary.payout_success_amount)}`, 
-      Icon: CheckCircle, 
-      iconBg: "bg-green-100", 
-      iconColor: "text-green-600" 
+    {
+      label: "Successful Payouts",
+      value: formatNumber(summary.successful_payouts),
+      change: null,
+      up: true,
+      sub: `₹${formatCurrency(summary.payout_success_amount)}`,
+      Icon: CheckCircle,
+      iconBg: "bg-green-100",
+      iconColor: "text-green-600"
     },
-    { 
-      label: "Failed Payouts", 
-      value: formatNumber(summary.failed_payouts), 
-      change: null, 
-      up: false, 
-      sub: "All time", 
-      Icon: XCircle, 
-      iconBg: "bg-red-100", 
-      iconColor: "text-red-500" 
+    {
+      label: "Failed Payouts",
+      value: formatNumber(summary.failed_payouts),
+      change: null,
+      up: false,
+      sub: "All time",
+      Icon: XCircle,
+      iconBg: "bg-red-100",
+      iconColor: "text-red-500"
     },
-    { 
-      label: "Pending Payouts", 
-      value: formatNumber(summary.pending_payouts), 
-      change: null, 
-      up: false, 
-      sub: "All time", 
-      Icon: Clock, 
-      iconBg: "bg-orange-100", 
-      iconColor: "text-orange-500" 
+    {
+      label: "Pending Payouts",
+      value: formatNumber(summary.pending_payouts),
+      change: null,
+      up: false,
+      sub: "All time",
+      Icon: Clock,
+      iconBg: "bg-orange-100",
+      iconColor: "text-orange-500"
     },
-    { 
-      label: "Success Rate", 
-      value: `${parseFloat(summary.success_rate || 0).toFixed(2)}%`, 
-      change: null, 
-      up: parseFloat(summary.success_rate) >= 50, 
-      sub: `${formatNumber(summary.total_payout_count)} total payouts`, 
-      Icon: TrendingUp, 
-      iconBg: "bg-emerald-100", 
-      iconColor: "text-emerald-600" 
+    {
+      label: "Success Rate",
+      value: `${parseFloat(summary.success_rate || 0).toFixed(2)}%`,
+      change: null,
+      up: parseFloat(summary.success_rate) >= 50,
+      sub: `${formatNumber(summary.total_payout_count)} total payouts`,
+      Icon: TrendingUp,
+      iconBg: "bg-emerald-100",
+      iconColor: "text-emerald-600"
     },
   ];
 
   // Bottom stat cards from API
   const bottomStatCards = [
-    { 
-      label: "Avg Payout Amount", 
-      value: summary.total_payout_count > 0 ? formatCurrency(parseFloat(summary.total_payout_amount) / parseInt(summary.total_payout_count)) : '₹0', 
-      change: null, 
-      up: true, 
-      sub: "All time", 
-      Icon: ArrowLeftRight, 
-      iconBg: "bg-purple-100", 
-      iconColor: "text-purple-600" 
+    {
+      label: "Avg Payout Amount",
+      value: summary.total_payout_count > 0 ? formatCurrency(parseFloat(summary.total_payout_amount) / parseInt(summary.total_payout_count)) : '₹0',
+      change: null,
+      up: true,
+      sub: "All time",
+      Icon: ArrowLeftRight,
+      iconBg: "bg-purple-100",
+      iconColor: "text-purple-600"
     },
-    { 
-      label: "Unique Beneficiaries", 
-      value: formatNumber(summary.total_unique_beneficiaries), 
-      change: null, 
-      up: true, 
-      sub: "All time", 
-      Icon: Users, 
-      iconBg: "bg-blue-100", 
-      iconColor: "text-blue-600" 
+    {
+      label: "Unique Beneficiaries",
+      value: formatNumber(summary.total_unique_beneficiaries),
+      change: null,
+      up: true,
+      sub: "All time",
+      Icon: Users,
+      iconBg: "bg-blue-100",
+      iconColor: "text-blue-600"
     },
-    { 
-      label: "Total Charges", 
-      value: formatCurrency(summary.total_charges), 
-      change: null, 
-      up: true, 
-      sub: "All time", 
-      Icon: Receipt, 
-      iconBg: "bg-green-100", 
-      iconColor: "text-green-600" 
+    {
+      label: "Total Charges",
+      value: formatCurrency(summary.total_charges),
+      change: null,
+      up: true,
+      sub: "All time",
+      Icon: Receipt,
+      iconBg: "bg-green-100",
+      iconColor: "text-green-600"
     },
-    { 
-      label: "Returned Amount", 
-      value: formatCurrency(summary.returned_amount), 
-      change: null, 
-      up: false, 
-      sub: `${formatNumber(summary.returned_payouts)} returned`, 
-      Icon: RefreshCw, 
-      iconBg: "bg-orange-100", 
-      iconColor: "text-orange-500" 
+    {
+      label: "Returned Amount",
+      value: formatCurrency(summary.returned_amount),
+      change: null,
+      up: false,
+      sub: `${formatNumber(summary.returned_payouts)} returned`,
+      Icon: RefreshCw,
+      iconBg: "bg-orange-100",
+      iconColor: "text-orange-500"
     },
-    { 
-      label: "Total Payouts", 
-      value: formatNumber(summary.total_payout_count), 
-      change: null, 
-      up: true, 
-      sub: "All time", 
-      Icon: Timer, 
-      iconBg: "bg-yellow-100", 
-      iconColor: "text-yellow-600" 
+    {
+      label: "Total Payouts",
+      value: formatNumber(summary.total_payout_count),
+      change: null,
+      up: true,
+      sub: "All time",
+      Icon: Timer,
+      iconBg: "bg-yellow-100",
+      iconColor: "text-yellow-600"
     },
-    { 
-      label: "Success Amount", 
-      value: formatCurrency(summary.payout_success_amount), 
-      change: null, 
-      up: true, 
-      sub: `${formatNumber(summary.successful_payouts)} successful`, 
-      Icon: IndianRupee, 
-      iconBg: "bg-emerald-100", 
-      iconColor: "text-emerald-600" 
+    {
+      label: "Success Amount",
+      value: formatCurrency(summary.payout_success_amount),
+      change: null,
+      up: true,
+      sub: `${formatNumber(summary.successful_payouts)} successful`,
+      Icon: IndianRupee,
+      iconBg: "bg-emerald-100",
+      iconColor: "text-emerald-600"
     },
   ];
 
@@ -443,7 +524,7 @@ export default function PayoutReport() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
           <p className="mt-4 text-red-600">{error}</p>
-          <button 
+          <button
             onClick={handleRefresh}
             className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
           >
@@ -468,7 +549,7 @@ export default function PayoutReport() {
             onDateChange={handleDateChange}
             placeholder="Select date range"
           />
-          
+
           {/* ── Merchant Dropdown ── */}
           <div className="relative">
             <button
@@ -563,13 +644,13 @@ export default function PayoutReport() {
             )}
           </div>
 
-          <button 
+          <button
             onClick={handleRefresh}
             className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg px-3 sm:px-4 py-1.5 sm:py-2 text-[11px] sm:text-xs font-semibold transition-colors"
           >
             Apply
           </button>
-          <button 
+          <button
             onClick={clearFilters}
             className="flex items-center gap-1 sm:gap-1.5 border border-gray-200 rounded-lg px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-xs text-gray-600 bg-white hover:bg-gray-50"
           >
@@ -742,12 +823,12 @@ export default function PayoutReport() {
                         <td className="py-1.5 sm:py-2 text-right text-gray-700 font-medium">
                           <span className="flex items-center justify-end gap-1">
                             {rate}
-                            <span 
+                            <span
                               className="inline-block w-5 h-1 rounded-full"
-                              style={{ 
-                                background: parseFloat(rate) >= 80 ? '#16a34a' : 
-                                           parseFloat(rate) >= 50 ? '#f59e0b' : '#ef4444'
-                              }} 
+                              style={{
+                                background: parseFloat(rate) >= 80 ? '#16a34a' :
+                                  parseFloat(rate) >= 50 ? '#f59e0b' : '#ef4444'
+                              }}
                             />
                           </span>
                         </td>
@@ -820,7 +901,7 @@ export default function PayoutReport() {
                 <div className="text-center text-gray-400 py-4">No distribution data available</div>
               )}
             </div>
-          
+
           </Card>
         </div>
       </div>

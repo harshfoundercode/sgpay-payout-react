@@ -164,6 +164,88 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
         fetchMerchants();
     }, []);
 
+    // ─── Helper function to format date as DD-M-YYYY ──────────────────────────
+    const formatDateForApi = (dateStr) => {
+        if (!dateStr) return '';
+
+        try {
+            // Try to parse as Date object first
+            const date = new Date(dateStr);
+            if (!isNaN(date.getTime())) {
+                const day = date.getDate();
+                const month = date.getMonth() + 1;
+                const year = date.getFullYear();
+                return `${day}-${month}-${year}`;
+            }
+
+            // If Date parsing fails, parse the string (format: "Jul 24, 2026")
+            const cleaned = dateStr.replace(/,/g, '').trim();
+            const parts = cleaned.split(' ');
+
+            if (parts.length === 3) {
+                const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                const monthIndex = monthNames.indexOf(parts[0]);
+                if (monthIndex !== -1) {
+                    const day = parseInt(parts[1]);
+                    const year = parts[2];
+                    const month = monthIndex + 1;
+                    return `${day}-${month}-${year}`;
+                }
+            }
+
+            // If all else fails, return original
+            return dateStr;
+        } catch (e) {
+            console.warn('Date formatting error:', e);
+            return dateStr;
+        }
+    };
+
+    // ─── Fetch transactions ──────────────────────────────────────────────────
+    // const fetchTransactions = async () => {
+    //     setLoading(true);
+    //     setError(null);
+
+    //     try {
+    //         const params = {
+    //             page: page,
+    //             limit: limit
+    //         };
+
+    //         if (searchTerm) {
+    //             params.search = searchTerm;
+    //         }
+
+    //         if (activeTab !== "all") {
+    //             params.status = activeTab;
+    //         } else if (selectedStatus) {
+    //             params.status = selectedStatus;
+    //         }
+
+    //         if (selectedMerchant) {
+    //             params.merchant_id = selectedMerchant;
+    //         }
+
+    //         if (selectedApi) {
+    //             params.api_used = selectedApi;
+    //         }
+
+    //         if (dateRange) {
+    //             params.from_date = dateRange.startFormatted;
+    //             params.to_date = dateRange.endFormatted;
+    //         }
+
+    //         const response = await transactionService.getTransactions(params);
+    //         setTransactionData(response);
+    //     } catch (err) {
+    //         console.error('Error fetching transactions:', err);
+    //         setError('Failed to load transactions. Please try again.');
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
+
     // ─── Fetch transactions ──────────────────────────────────────────────────
     const fetchTransactions = async () => {
         setLoading(true);
@@ -194,9 +276,12 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
             }
 
             if (dateRange) {
-                params.from_date = dateRange.startFormatted;
-                params.to_date = dateRange.endFormatted;
+                // Format dates as DD-M-YYYY
+                params.from_date = formatDateForApi(dateRange.startFormatted);
+                params.to_date = formatDateForApi(dateRange.endFormatted);
             }
+
+            console.log('API Params:', params);
 
             const response = await transactionService.getTransactions(params);
             setTransactionData(response);
@@ -520,18 +605,18 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
                             key={tab.key}
                             onClick={() => { setActiveTab(tab.key); setPage(1); }}
                             className={`flex flex-col items-center px-3 sm:px-5 py-1.5 sm:py-2.5 rounded-lg text-[11px] sm:text-sm font-medium transition-colors whitespace-nowrap border ${activeTab === tab.key
-                                    ? "bg-[#ECF2FE] text-blue-600 border-blue-500"
-                                    : "text-gray-600 border-gray-100 hover:bg-blue-50"
+                                ? "bg-[#ECF2FE] text-blue-600 border-blue-500"
+                                : "text-gray-600 border-gray-100 hover:bg-blue-50"
                                 }`}
                         >
                             <span>{tab.label}</span>
                             <span className={`text-[10px] sm:text-xs font-bold mt-0.5 ${activeTab === tab.key ? "text-blue-600" :
-                                    tab.key === 'success' ? "text-green-600" :
-                                        tab.key === 'failed' ? "text-red-600" :
-                                            tab.key === 'returned' ? "text-orange-600" :
-                                                tab.key === 'initiated' ? "text-yellow-600" :
-                                                    tab.key === 'processing' ? "text-blue-600" :
-                                                        "text-gray-600"
+                                tab.key === 'success' ? "text-green-600" :
+                                    tab.key === 'failed' ? "text-red-600" :
+                                        tab.key === 'returned' ? "text-orange-600" :
+                                            tab.key === 'initiated' ? "text-yellow-600" :
+                                                tab.key === 'processing' ? "text-blue-600" :
+                                                    "text-gray-600"
                                 }`}>
                                 {tab.count.toLocaleString()}
                             </span>
@@ -704,8 +789,8 @@ const TransactionsPage = ({ onViewDetails, onExportClick }) => {
                                         key={p}
                                         onClick={() => setPage(p)}
                                         className={`w-7 h-7 sm:w-8 sm:h-8 rounded text-[10px] sm:text-xs font-medium ${page === p
-                                                ? "bg-blue-600 text-white"
-                                                : "border border-gray-200 text-gray-600 hover:bg-gray-50"
+                                            ? "bg-blue-600 text-white"
+                                            : "border border-gray-200 text-gray-600 hover:bg-gray-50"
                                             }`}
                                     >
                                         {p}
@@ -1104,8 +1189,8 @@ const TransactionDetails = ({ txn, onBack }) => {
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             className={`px-3 sm:px-4 py-2.5 sm:py-3.5 text-[12px] sm:text-sm font-medium whitespace-nowrap border-b-2 transition-colors ${activeTab === tab
-                                    ? "text-blue-600 border-blue-600"
-                                    : "text-gray-600 border-transparent hover:text-gray-800"
+                                ? "text-blue-600 border-blue-600"
+                                : "text-gray-600 border-transparent hover:text-gray-800"
                                 }`}
                         >
                             {tab}
